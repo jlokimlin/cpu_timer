@@ -6,6 +6,16 @@ An object-oriented approach for timing program execution in modern Fortran (2008
 
 ```fortran
 
+use, intrinsic :: iso_fortran_env, only: &
+    WP     => REAL64, &
+    IP     => INT32
+
+use type_cpu_timer_mod, only: &
+    cpu_timer_t
+
+! Explicit typing only
+implicit none
+
 type (cpu_timer_t) :: timer
 real (WP)          :: t
 integer (IP)       :: units
