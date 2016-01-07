@@ -25,6 +25,7 @@ build_lib:
 	ar rc libcpu_timer.a \
 	$(obj_directory)/type_cpu_timer_mod.o
 	
+	cp libcpu_timer.a /usr/local/lib
 	mv libcpu_timer.a $(lib_directory)
 
 run:
