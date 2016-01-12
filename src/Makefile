@@ -1,32 +1,31 @@
-include ./fcomp.inc
+include ./compiler_flags.inc
 include ./directories.inc
 
-# Add the required internal libraries
-libInclude = \
--I$(obj_directory)
+LINKS = \
+-I$(OBJ_DIRECTORY)
 
-executable = ./exe
+EXECUTABLE = ./exe
 
 type_cpu_timer_mod.o: \
 type_cpu_timer_mod.f90
-	$(fcomp) -c type_cpu_timer_mod.f90 $(libInclude)\
-	 -o $(obj_directory)/$@ -J$(obj_directory)
+	$(FC) $(FFLAGS) -c type_cpu_timer_mod.f90 $(LINKS) \
+	 -o $(OBJ_DIRECTORY)/$@ -J$(OBJ_DIRECTORY)
 
 main.o: \
 type_cpu_timer_mod.o \
 main.f90
-	$(fcomp) -c main.f90 $(libInclude)\
-	 -o $(obj_directory)/$@
+	$(FC) $(FFLAGS) -c main.f90 $(LINKS) \
+	-o $(OBJ_DIRECTORY)/$@
 
-exec: $(objects)
-	$(fcomp) -o $(executable) $(objects_with_prefix) $(libInclude)
+exec: $(OBJECTS)
+	$(FC) $(FFLAGS) -o $(EXECUTABLE) $(OBJECTS_WITH_PREFIX) $(LINKS)
 
 build_lib: 
 	ar rc libcpu_timer.a \
-	$(obj_directory)/type_cpu_timer_mod.o
+	$(OBJ_DIRECTORY)/type_cpu_timer_mod.o
 	
 	cp libcpu_timer.a /usr/local/lib
-	mv libcpu_timer.a $(lib_directory)
+	mv libcpu_timer.a $(LIB_DIRECTORY)
 
 run:
 	make clean
@@ -35,5 +34,5 @@ run:
 	./exe
 	 
 clean:
-	rm -f $(objects)
-	rm -f $(executable)
+	rm -f $(OBJECTS)
+	rm -f $(EXECUTABLE)

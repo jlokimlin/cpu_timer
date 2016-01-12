@@ -1,20 +1,20 @@
-include ../fcomp.inc
+include ../compiler_flags.inc
 include ./relative_directories.inc
 
-# Add the required internal libraries
-libInclude = \
--I$(obj_directory) \
--lcpu_timer -L$(lib_directory)
+# Add library
+LINKS = \
+-I$(OBJ_DIRECTORY) \
+-lcpu_timer -L$(LIB_DIRECTORY)
 
-executable = ./exe
+EXECUTABLE = ./exe
 	 
 test.o: \
 test.f90
-	$(fcomp) -c test.f90 $(libInclude)\
-	 -o $(obj_directory)/$@
+	$(FC) $(FFLAGS) -c test.f90 $(LINKS)\
+	 -o $(OBJ_DIRECTORY)/$@
 
 exec: $(objects)
-	$(fcomp) -o $(executable) $(objects_with_prefix) $(libInclude)
+	$(FC) $(FFLAGS) -o $(EXECUTABLE) $(OBJECTS_WITH_PREFIX) $(LINKS)
 
 run:
 	make clean
@@ -22,5 +22,5 @@ run:
 	./exe
 	 
 clean:
-	rm -f $(objects)
-	rm -f $(executable)
+	rm -f $(OBJECTS)
+	rm -f $(EXECUTABLE)
