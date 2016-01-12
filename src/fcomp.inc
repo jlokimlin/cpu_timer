@@ -1,7 +1,7 @@
 # Set the compiler options
 
 fcomp = \
-gfortran \
+/home/jlokimlin/gcc-6/bin/gfortran \
 $(LANGUAGE_OPTIONS) \
 $(ERROR_WARNING_OPTIONS) \
 $(CODE_GENERATION_OPTIONS)
