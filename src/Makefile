@@ -20,19 +20,23 @@ main.f90
 exec: $(OBJECTS)
 	$(FC) $(FFLAGS) -o $(EXECUTABLE) $(OBJECTS_WITH_PREFIX) $(LINKS)
 
-build_lib: 
+lib: 
 	ar rc libcpu_timer.a \
 	$(OBJ_DIRECTORY)/type_cpu_timer_mod.o
 	
 	cp libcpu_timer.a /usr/local/lib
 	mv libcpu_timer.a $(LIB_DIRECTORY)
 
+all: 
+	make run
+	cd ./test; make run
+
 run:
 	make clean
 	make exec
-	make build_lib	
+	make lib	
 	./exe
 	 
 clean:
-	rm -f $(OBJECTS)
+	rm -f $(OBJ_DIRECTORY)/*.o $(OBJ_DIRECTORY)/*.mod
 	rm -f $(EXECUTABLE)

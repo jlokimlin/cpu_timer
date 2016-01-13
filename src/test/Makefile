@@ -1,7 +1,6 @@
 include ../compiler_flags.inc
 include ./relative_directories.inc
 
-# Add library
 LINKS = \
 -I$(OBJ_DIRECTORY) \
 -lcpu_timer -L$(LIB_DIRECTORY)
@@ -13,7 +12,7 @@ test.f90
 	$(FC) $(FFLAGS) -c test.f90 $(LINKS)\
 	 -o $(OBJ_DIRECTORY)/$@
 
-exec: $(objects)
+exec: $(OBJECTS)
 	$(FC) $(FFLAGS) -o $(EXECUTABLE) $(OBJECTS_WITH_PREFIX) $(LINKS)
 
 run:

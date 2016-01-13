@@ -23,7 +23,7 @@ CODE_GENERATION_OPTIONS = \
 -frounding-math \
 -fsignaling-nans
 
-#References:
+# References:
 # https://gcc.gnu.org/onlinedocs/gfortran/Code-Gen-Options.html#Code-Gen-Options
 # https://gcc.gnu.org/onlinedocs/gfortran/Error-and-Warning-Options.html#Error-and-Warning-Options
 # https://gcc.gnu.org/onlinedocs/gfortran/Option-Summary.html
