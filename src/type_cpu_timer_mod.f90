@@ -289,11 +289,11 @@ contains
 
                 case( REQUEST_TIME_IN_MINUTES )
 
-                    return_value = return_value/60
+                    return_value = return_value/ 60
 
                 case( REQUEST_TIME_IN_HOURS )
 
-                    return_value = return_value/3600
+                    return_value = return_value/ 3600
 
                 case default
 
@@ -305,7 +305,7 @@ contains
     !
     !*****************************************************************************************
     !
-    subroutine Print_time_stamp( )
+    subroutine Print_time_stamp( file_unit )
         !
         !< Purpose:
         !
@@ -329,6 +329,10 @@ contains
         !   12/20/15       Jon Lo Kim Lin         Object-oriented implementation
         !
         !--------------------------------------------------------------------------------
+        ! Dictionary: calling arguments
+        !--------------------------------------------------------------------------------
+        integer (IP), intent (in), optional :: file_unit
+        !--------------------------------------------------------------------------------
         ! Dictionary: local variables
         !--------------------------------------------------------------------------------
         integer (IP)                  :: values(8)
@@ -341,11 +345,18 @@ contains
             'May      ', 'June     ', 'July     ', 'August   ', &
             'September', 'October  ', 'November ', 'December ' ]
         character (*), parameter  :: TIME_FORMAT = &
-            '( A, 1x, i2, 1x, i4, 2x, i2, a1, i2.2, a1, i2.2, a1, i3.3, 1x, a)'
+            '( A, 1X, I2, 1X, I4, 2X, I2, A1, I2.2, A1, I2.2, A1, I3.3, 1X, A)'
         !--------------------------------------------------------------------------------
 
-        ! Get the corresponding date and time information from the real-time system clock.
+        !--------------------------------------------------------------------------------
+        ! Get the corresponding date and time information from the real-time system clock
+        !--------------------------------------------------------------------------------
+
         call date_and_time( date, time, zone, values )
+
+        !--------------------------------------------------------------------------------
+        ! Associate results
+        !--------------------------------------------------------------------------------
 
         associate( &
             year        => values(1), &
@@ -378,10 +389,27 @@ contains
                 end if
             end if
 
-            write ( stdout, TIME_FORMAT ) &
-                trim( LIST_OF_MONTHS(month) ), &
-                day, year, hour, ':', &
-                minute, ':', second, '.', millisecond, trim( am_or_pm )
+            !--------------------------------------------------------------------------------
+            ! Return time stamp
+            !--------------------------------------------------------------------------------
+
+            if ( present( file_unit )) then
+
+                write ( file_unit, fmt =  TIME_FORMAT ) &
+                    trim( LIST_OF_MONTHS(month) ), &
+                    day, year, hour, ':', &
+                    minute, ':', second, '.', &
+                    millisecond, trim( am_or_pm )
+
+            else
+
+                write ( stdout, fmt = TIME_FORMAT ) &
+                    trim( LIST_OF_MONTHS(month) ), &
+                    day, year, hour, ':', &
+                    minute, ':', second, '.', &
+                    millisecond, trim( am_or_pm )
+
+            end if
 
         end associate
 
