@@ -1,5 +1,11 @@
+
 include ./compiler_flags.inc
 include ./directories.inc
+
+#EXTERNAL_LIBRARY_PATH = /usr/local/lib
+EXTERNAL_LIBRARY_PATH = /usr/local/lib64
+
+BIN_PATH = /usr/local/bin
 
 LINKS = \
 -I$(OBJ_DIRECTORY)
@@ -23,20 +29,22 @@ exec: $(OBJECTS)
 lib: 
 	ar rc libcpu_timer.a \
 	$(OBJ_DIRECTORY)/type_cpu_timer_mod.o
-	
-	cp libcpu_timer.a /usr/local/lib
+
 	mv libcpu_timer.a $(LIB_DIRECTORY)
 
-all: 
-	make run
+all:
+	make clean
+	make exec; ./exe
+	make lib
+	make testcpu_timer
+
+testcpu_timer:
 	cd ./test; make run
 
-run:
-	make clean
-	make exec
-	make lib	
-	./exe
-	 
+install:
+	cp $(LIB_DIRECTORY)/libcpu_timer.a $(EXTERNAL_LIBRARY_PATH)
+	cp -r ../../CPU_timer $(BIN_PATH)
+
 clean:
-	rm -f $(OBJ_DIRECTORY)/*.o $(OBJ_DIRECTORY)/*.mod
+	rm -f $(OBJ_DIRECTORY)/*.o $(OBJ_DIRECTORY)/*.mod $(LIB_DIRECTORY)/*.a
 	rm -f $(EXECUTABLE)

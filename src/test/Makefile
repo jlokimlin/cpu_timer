@@ -1,9 +1,10 @@
+
 include ../compiler_flags.inc
 include ./relative_directories.inc
 
 LINKS = \
 -I$(OBJ_DIRECTORY) \
--lcpu_timer -L$(LIB_DIRECTORY)
+-L$(LIB_DIRECTORY) -lcpu_timer
 
 EXECUTABLE = ./exe
 	 
@@ -17,8 +18,7 @@ exec: $(OBJECTS)
 
 run:
 	make clean
-	make exec
-	./exe
+	make exec; ./exe
 	 
 clean:
 	rm -f $(OBJECTS)
