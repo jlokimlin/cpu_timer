@@ -1,6 +1,5 @@
 
-include ./compiler_flags.inc
-include ./directories.inc
+include ../make.inc
 
 #EXTERNAL_LIBRARY_PATH = /usr/local/lib
 EXTERNAL_LIBRARY_PATH = /usr/local/lib64
@@ -36,14 +35,6 @@ all:
 	make clean
 	make exec; ./exe
 	make lib
-	make testcpu_timer
-
-testcpu_timer:
-	cd ./test; make run
-
-install:
-	cp $(LIB_DIRECTORY)/libcpu_timer.a $(EXTERNAL_LIBRARY_PATH)
-	cp -r ../../CPU_timer $(BIN_PATH)
 
 clean:
 	rm -f $(OBJ_DIRECTORY)/*.o $(OBJ_DIRECTORY)/*.mod $(LIB_DIRECTORY)/*.a
