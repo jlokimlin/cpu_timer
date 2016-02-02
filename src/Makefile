@@ -11,13 +11,13 @@ LINKS = \
 
 EXECUTABLE = ./exe
 
-type_cpu_timer_mod.o: \
-type_cpu_timer_mod.f90
-	$(FC) $(FFLAGS) -c type_cpu_timer_mod.f90 $(LINKS) \
+type_cputimer.o: \
+type_cputimer.f90
+	$(FC) $(FFLAGS) -c type_cputimer.f90 $(LINKS) \
 	 -o $(OBJ_DIRECTORY)/$@ -J$(OBJ_DIRECTORY)
 
 main.o: \
-type_cpu_timer_mod.o \
+type_cputimer.o \
 main.f90
 	$(FC) $(FFLAGS) -c main.f90 $(LINKS) \
 	-o $(OBJ_DIRECTORY)/$@
@@ -26,9 +26,7 @@ exec: $(OBJECTS)
 	$(FC) $(FFLAGS) -o $(EXECUTABLE) $(OBJECTS_WITH_PREFIX) $(LINKS)
 
 lib: 
-	ar rc libcpu_timer.a \
-	$(OBJ_DIRECTORY)/type_cpu_timer_mod.o
-
+	ar rc libcpu_timer.a $(OBJ_DIRECTORY)/*.o
 	mv libcpu_timer.a $(LIB_DIRECTORY)
 
 all:

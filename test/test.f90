@@ -2,7 +2,7 @@
 !
 !< Purpose:
 !
-!  Demonstrates usage of TYPE (cpu_timer_t)
+!  Demonstrates usage of TYPE (CpuTimer)
 !
 !
 !< Licensing:
@@ -28,40 +28,40 @@ program test
         IP     => INT32, &
         stdout => OUTPUT_UNIT
 
-    use type_cpu_timer_mod, only: &
-        cpu_timer_t
+    use type_CpuTimer, only: &
+        CpuTimer
 
     ! Explicit typing only
     implicit none
     
-    call Test_all()
+    call Main_test()
     
 contains
     !
     !*****************************************************************************************
     !
-    subroutine Test_all()
+    subroutine Main_test()
         !
         !---------------------------------------------------------------------------------
         ! Dictionary: local variables
         !---------------------------------------------------------------------------------
-        type (cpu_timer_t)      :: timer
+        type (CpuTimer)      :: timer
         !---------------------------------------------------------------------------------
 
         ! Print time stamp
-        call timer%Print_time_stamp( )
+        call timer%Print_time_stamp()
 
         write ( stdout, '(A)' ) ' '
         write ( stdout, '(A)' ) '*********************************************'
         write ( stdout, '(A)' ) ' '
-        write ( stdout, '(A)' ) '  Demonstrates usage of TYPE (cpu_timer_t).'
+        write ( stdout, '(A)' ) '  Demonstrates usage of TYPE (CpuTimer).'
         write ( stdout, '(A)' ) ' '
 
-        call Time_random_number_routine ( )
-        call Time_vectorized_EXP_routine ( )
-        call Time_unvectorized_EXP_routine ( )
-        call Time_2D_nearest_neighbor_problem ( )
-        call Time_matrix_multiplication_problem ( )
+        call Time_random_number_routine ()
+        call Time_vectorized_EXP_routine ()
+        call Time_unvectorized_EXP_routine ()
+        call Time_2D_nearest_neighbor_problem ()
+        call Time_matrix_multiplication_problem ()
         !
         !  Terminate.
         !
@@ -72,13 +72,13 @@ contains
         write ( stdout, '(A)' ) ' '
 
         ! Print time stamp
-        call timer%Print_time_stamp( )
+        call timer%Print_time_stamp()
 
-    end subroutine Test_all
+    end subroutine Main_test
     !
     !*****************************************************************************************
     !
-    subroutine Time_random_number_routine ( )
+    subroutine Time_random_number_routine ()
         !
         !< Purpose:
         !
@@ -101,7 +101,7 @@ contains
         !---------------------------------------------------------------------------------
         ! Dictionary: local variables
         !---------------------------------------------------------------------------------
-        type (cpu_timer_t)      :: timer
+        type (CpuTimer)      :: timer
         integer (IP)            :: n_log, rep   !! Counters
         integer (IP), parameter :: N_LOG_MIN = 0
         integer (IP), parameter :: N_LOG_MAX = 20
@@ -172,7 +172,7 @@ contains
     !
     !*****************************************************************************************
     !
-    subroutine Time_vectorized_EXP_routine( )
+    subroutine Time_vectorized_EXP_routine()
         !
         !< Purpose:
         !
@@ -195,7 +195,7 @@ contains
         !--------------------------------------------------------------------------------
         ! Dictionary: local variables
         !--------------------------------------------------------------------------------
-        type (cpu_timer_t)       :: timer
+        type (CpuTimer)       :: timer
         integer (IP)             :: func, i_rep, n_log !! Counters
         integer (IP), parameter  :: N_LOG_MIN = 12
         integer (IP), parameter  :: N_LOG_MAX = 22
@@ -293,7 +293,7 @@ contains
     !
     !*****************************************************************************************
     !
-    subroutine Time_unvectorized_EXP_routine ( )
+    subroutine Time_unvectorized_EXP_routine ()
         !
         !< Purpose:
         !
@@ -316,7 +316,7 @@ contains
         !--------------------------------------------------------------------------------
         ! Dictionary: local variables
         !--------------------------------------------------------------------------------
-        type (cpu_timer_t)       :: timer
+        type (CpuTimer)       :: timer
         integer (IP)             :: func, i, i_rep, n_log !! Counters
         integer (IP), parameter  :: N_LOG_MIN = 12
         integer (IP), parameter  :: N_LOG_MAX = 22
@@ -422,7 +422,7 @@ contains
     !
     !*****************************************************************************************
     !
-    subroutine Time_2D_nearest_neighbor_problem( )
+    subroutine Time_2D_nearest_neighbor_problem()
         !
         !< Purpose:
         !
@@ -445,7 +445,7 @@ contains
         !--------------------------------------------------------------------------------
         ! Dictionary: local variables
         !--------------------------------------------------------------------------------
-        type (cpu_timer_t)      :: timer
+        type (CpuTimer)      :: timer
         integer (IP)            :: i, i_rep, n_log !! Counters
         integer (IP)            :: i_min
         integer (IP), parameter :: N_LOG_MIN = 10
@@ -534,7 +534,7 @@ contains
     !
     !*****************************************************************************************
     !
-    subroutine Time_matrix_multiplication_problem( )
+    subroutine Time_matrix_multiplication_problem()
         !
         !< Purpose:
         !
@@ -557,7 +557,7 @@ contains
         !--------------------------------------------------------------------------------
         ! Dictionary: local variables
         !--------------------------------------------------------------------------------
-        type (cpu_timer_t)        :: timer
+        type (CpuTimer)        :: timer
         integer (IP)              :: i, j, k    !! Counters
         integer (IP)              :: l_log, rep !! Counters
         integer (IP), parameter   :: L_LOG_MIN = 1

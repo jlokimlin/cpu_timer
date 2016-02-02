@@ -3,7 +3,7 @@ include ../make.inc
 
 LINKS = \
 -I$(OBJ_DIRECTORY) \
--L$(LIB_DIRECTORY) -lcpu_timer
+-L$(LIB_DIRECTORY) -lcputimer
 
 EXECUTABLE = ./exe
 

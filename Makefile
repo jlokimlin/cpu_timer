@@ -1,8 +1,8 @@
 
 include make.inc
 
-EXTERNAL_LIBRARY_PATH = /usr/local/lib
-#EXTERNAL_LIBRARY_PATH = /usr/local/lib64
+#EXTERNAL_LIBRARY_PATH = /usr/local/lib
+EXTERNAL_LIBRARY_PATH = /usr/local/lib64
 
 BIN_PATH = /usr/local/bin
 
@@ -17,3 +17,5 @@ testlib:
 install:
 	cp ./lib/libcpu_timer.a $(EXTERNAL_LIBRARY_PATH)
 	cp -r ../CPU_timer $(BIN_PATH)
+
+.PHONY: all lib testlib install

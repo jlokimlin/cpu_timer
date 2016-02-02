@@ -1,7 +1,7 @@
 program main
 
-    use type_cpu_timer_mod, only: &
-        cpu_timer_t
+    use type_CpuTimer, only: &
+        CpuTimer
 
     print '(A)', 'Successful build!'
 

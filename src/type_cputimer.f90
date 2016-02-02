@@ -1,36 +1,10 @@
 !*****************************************************************************************
 !
 !< Purpose:
-!< Defines an object for timing program execution
 !
-!  Usage:
+! Defines a class for timing program execution
 !
-!         type (cpu_timer_t) :: timer
-!         real (WP)          :: t
-!         integer (IP)       :: units
-!
-!         !*Starting the timer
-!
-!               call timer%Start()
-!
-!         !* Stopping the timer
-!
-!               call timer%Stop()
-!
-!         !* Reading the time
-!
-!               t = timer%Get_elapsed_time( units ) ! Wall clock time
-!               t = timer%Get_total_time( units )   ! Total processor time
-!
-!         !* units (optional) = 0 for seconds, or 1 for minutes, or 2 for hours
-!
-!         !* Get time stamp
-!
-!               call timer%Get_time_stamp()
-!
-!*****************************************************************************************
-!
-module type_cpu_timer_mod
+module type_CpuTimer
 
     use, intrinsic :: iso_fortran_env, only: &
         WP     => REAL64, &
@@ -42,7 +16,7 @@ module type_cpu_timer_mod
 
     ! Everything is private unless stated otherwise
     private
-    public :: cpu_timer_t
+    public :: CpuTimer
 
     !---------------------------------------------------------------------------------
     ! Dictionary: global variables confined to the module
@@ -53,7 +27,7 @@ module type_cpu_timer_mod
     !---------------------------------------------------------------------------------
 
     ! Declare derived data type
-    type, public :: cpu_timer_t
+    type, public :: CpuTimer
 
         ! All components are private unless stated otherwise
         private
@@ -83,23 +57,23 @@ module type_cpu_timer_mod
         !---------------------------------------------------------------------------------
         ! Public methods
         !---------------------------------------------------------------------------------
-        procedure, public         :: Start => Start_timer
-        procedure, public         :: Stop  => Stop_timer
-        procedure, public         :: Get_total_time
-        procedure, public         :: Get_elapsed_time
-        procedure, public, nopass :: Print_time_stamp
+        procedure, public         :: start => start_timer
+        procedure, public         :: stop  => stop_timer
+        procedure, public         :: get_total_time
+        procedure, public         :: get_elapsed_time
+        procedure, public, nopass :: print_time_stamp
         !---------------------------------------------------------------------------------
         ! Private methods
         !---------------------------------------------------------------------------------
-        procedure                 :: Create  => Initialize_timer
-        procedure                 :: Destroy => Destruct_timer
+        procedure                 :: create  => initialize_timer
+        procedure                 :: destroy => destruct_timer
         !---------------------------------------------------------------------------------
         ! Finalizer
         !---------------------------------------------------------------------------------
-        final                     :: Finalize_timer
+        final                     :: finalize_CpuTimer
         !---------------------------------------------------------------------------------
 
-    end type cpu_timer_t
+    end type CpuTimer
 
 contains
     !
@@ -109,12 +83,12 @@ contains
     !
     !*****************************************************************************************
     !
-    subroutine Start_timer( this )
+    subroutine start_timer( this )
         !
         !--------------------------------------------------------------------------------
         ! Dictionary: calling arguments
         !--------------------------------------------------------------------------------
-        class (cpu_timer_t), intent (in out) :: this
+        class (CpuTimer), intent (in out) :: this
         !--------------------------------------------------------------------------------
 
         ! Initialize timer
@@ -129,16 +103,16 @@ contains
         ! Set timer status
         this%timer_started = .true.
 
-    end subroutine Start_timer
+    end subroutine start_timer
     !
     !*****************************************************************************************
     !
-    subroutine Stop_timer( this )
+    subroutine stop_timer( this )
         !
         !--------------------------------------------------------------------------------
         ! Dictionary: calling arguments
         !--------------------------------------------------------------------------------
-        class (cpu_timer_t), intent (in out) :: this
+        class (CpuTimer), intent (in out) :: this
         !--------------------------------------------------------------------------------
 
         ! Check timer flag
@@ -153,16 +127,16 @@ contains
         ! Set timer status
         this%timer_stopped = .true.
 
-    end subroutine Stop_timer
+    end subroutine stop_timer
     !
     !*****************************************************************************************
     !
-    function Get_total_time( this, units ) result( return_value )
+    function get_total_time( this, units ) result( return_value )
         !
         !--------------------------------------------------------------------------------
         ! Dictionary: calling arguments
         !--------------------------------------------------------------------------------
-        class (cpu_timer_t), intent (in out)        :: this
+        class (CpuTimer), intent (in out)        :: this
         integer (IP),        intent (in), optional  :: units
         real (WP)                                   :: return_value
         !--------------------------------------------------------------------------------
@@ -184,7 +158,7 @@ contains
 
         if ( .not.this%timer_stopped )     then
 
-            call this%Stop()
+            call this%stop()
 
         end if
 
@@ -221,16 +195,16 @@ contains
             end select
         end if
 
-    end function Get_total_time
+    end function get_total_time
     !
     !*****************************************************************************************
     !
-    function Get_elapsed_time( this, units ) result ( return_value )
+    function get_elapsed_time( this, units ) result ( return_value )
         !
         !--------------------------------------------------------------------------------
         ! Dictionary: calling arguments
         !--------------------------------------------------------------------------------
-        class (cpu_timer_t), intent (in out)        :: this
+        class (CpuTimer), intent (in out)        :: this
         integer (IP),        intent (in), optional  :: units
         real (WP)                                   :: return_value
         !--------------------------------------------------------------------------------
@@ -252,7 +226,7 @@ contains
 
         if ( .not.this%timer_stopped )     then
 
-            call this%Stop()
+            call this%stop()
 
         end if
 
@@ -301,15 +275,15 @@ contains
 
         end if
 
-    end function Get_elapsed_time
+    end function get_elapsed_time
     !
     !*****************************************************************************************
     !
-    subroutine Print_time_stamp( file_unit )
+    subroutine print_time_stamp( file_unit )
         !
         !< Purpose:
         !
-        !  Prints the current YMDHMS date as a time stamp.
+        !  prints the current YMDHMS date as a time stamp.
         !
         !< Example:
         !
@@ -344,7 +318,7 @@ contains
             'January  ', 'February ', 'March    ', 'April    ', &
             'May      ', 'June     ', 'July     ', 'August   ', &
             'September', 'October  ', 'November ', 'December ' ]
-        character (*), parameter  :: TIME_FORMAT = &
+        character (len=*), parameter  :: TIME_FORMAT = &
             '( A, 1X, I2, 1X, I4, 2X, I2, A1, I2.2, A1, I2.2, A1, I3.3, 1X, A)'
         !--------------------------------------------------------------------------------
 
@@ -396,7 +370,7 @@ contains
             if ( present( file_unit )) then
 
                 write ( file_unit, fmt =  TIME_FORMAT ) &
-                    trim( LIST_OF_MONTHS(month) ), &
+                    trim( LIST_OF_MONTHS( month ) ), &
                     day, year, hour, ':', &
                     minute, ':', second, '.', &
                     millisecond, trim( am_or_pm )
@@ -404,7 +378,7 @@ contains
             else
 
                 write ( stdout, fmt = TIME_FORMAT ) &
-                    trim( LIST_OF_MONTHS(month) ), &
+                    trim( LIST_OF_MONTHS( month ) ), &
                     day, year, hour, ':', &
                     minute, ':', second, '.', &
                     millisecond, trim( am_or_pm )
@@ -413,7 +387,7 @@ contains
 
         end associate
 
-    end subroutine Print_time_stamp
+    end subroutine print_time_stamp
     !
     !*****************************************************************************************
     !
@@ -421,12 +395,12 @@ contains
     !
     !*****************************************************************************************
     !
-    subroutine Initialize_timer( this )
+    subroutine initialize_timer( this )
         !
         !--------------------------------------------------------------------------------
         ! Dictionary: calling arguments
         !--------------------------------------------------------------------------------
-        class (cpu_timer_t), intent (in out) :: this
+        class (CpuTimer), intent (in out) :: this
         !--------------------------------------------------------------------------------
 
         !--------------------------------------------------------------------------------
@@ -448,16 +422,16 @@ contains
             count_rate = this%count_rate, &
             count_max  = this%count_max )
 
-    end subroutine Initialize_timer
+    end subroutine initialize_timer
     !
     !*****************************************************************************************
     !
-    subroutine Destruct_timer( this )
+    subroutine destruct_timer( this )
         !
         !--------------------------------------------------------------------------------
         ! Dictionary: calling arguments
         !--------------------------------------------------------------------------------
-        class (cpu_timer_t), intent (in out) :: this
+        class (CpuTimer), intent (in out) :: this
         !--------------------------------------------------------------------------------
 
         !--------------------------------------------------------------------------------
@@ -491,22 +465,22 @@ contains
         this%count_rate      = 0_IP
         this%num_ticks       = 0_IP
 
-    end subroutine Destruct_timer
+    end subroutine destruct_timer
     !
     !*****************************************************************************************
     !
-    subroutine Finalize_timer( this )
+    subroutine finalize_CpuTimer( this )
         !
         !--------------------------------------------------------------------------------
         ! Dictionary: calling arguments
         !--------------------------------------------------------------------------------
-        type (cpu_timer_t), intent (in out) :: this
+        type (CpuTimer), intent (in out) :: this
         !--------------------------------------------------------------------------------
 
         call this%Destroy()
 
-    end subroutine Finalize_timer
+    end subroutine finalize_CpuTimer
     !
     !*****************************************************************************************
     !
-end module type_cpu_timer_mod
+end module type_CpuTimer

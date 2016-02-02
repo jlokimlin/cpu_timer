@@ -10,33 +10,33 @@ use, intrinsic :: iso_fortran_env, only: &
     WP     => REAL64, &
     IP     => INT32
 
-use type_cpu_timer_mod, only: &
-    cpu_timer_t
+use type_CpuTimer, only: &
+    CpuTimer
 
 ! Explicit typing only
 implicit none
 
-type (cpu_timer_t) :: timer
-real (WP)          :: t
-integer (IP)       :: units
+type (CpuTimer)            :: timer
+real (WP)                  :: wall_clock_time
+real (WP)	               :: total_processor_time
+integer (IP), parameter    :: UNITS = 0 ! (optional argument) = 0 for seconds, or 1 for minutes, or 2 for hours
 
-!*Starting the timer
+!*starting the timer
 
-call timer%Start()
+call timer%start()
 
-!* Stopping the timer
+!* stopping the timer
 
-call timer%Stop()
+call timer%stop()
 
 !* Reading the time
 
-t = timer%Get_elapsed_time( units ) ! Wall clock time
-t = timer%Get_total_time( units )   ! Total processor time
+wall_clock_time = timer%get_elapsed_time( UNITS )
 
-!* units (optional) = 0 for seconds, or 1 for minutes, or 2 for hours
+total_processor_time = timer%get_total_time( UNITS )
 
 !* Get time stamp
 
-call timer%Get_time_stamp()
+call timer%print_time_stamp()
 
 ```
