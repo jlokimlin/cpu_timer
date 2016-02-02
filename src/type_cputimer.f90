@@ -7,8 +7,8 @@
 module type_CpuTimer
 
     use, intrinsic :: iso_fortran_env, only: &
-        WP     => REAL64, &
-        IP     => INT32, &
+        wp     => REAL64, &
+        ip     => INT32, &
         stdout => OUTPUT_UNIT
 
     ! Explicit typing only
@@ -21,9 +21,9 @@ module type_CpuTimer
     !---------------------------------------------------------------------------------
     ! Dictionary: global variables confined to the module
     !---------------------------------------------------------------------------------
-    integer (IP), parameter  :: REQUEST_TIME_IN_SECONDS = 0_IP
-    integer (IP), parameter  :: REQUEST_TIME_IN_MINUTES = 1_IP
-    integer (IP), parameter  :: REQUEST_TIME_IN_HOURS   = 2_IP
+    integer (ip), parameter  :: request_time_in_seconds = 0_ip
+    integer (ip), parameter  :: request_time_in_minutes = 1_ip
+    integer (ip), parameter  :: request_time_in_hours   = 2_ip
     !---------------------------------------------------------------------------------
 
     ! Declare derived data type
@@ -39,14 +39,14 @@ module type_CpuTimer
         logical         :: timer_started   = .false.
         logical         :: timer_stopped   = .false.
         !---------------------------------------------------------------------------------
-        real (WP)       :: cpu_start_time  = 0.0_WP
-        real (WP)       :: cpu_finish_time = 0.0_WP
+        real (wp)       :: cpu_start_time  = 0.0_wp
+        real (wp)       :: cpu_finish_time = 0.0_wp
         !---------------------------------------------------------------------------------
-        integer (IP)    :: initial_ticks   = 0_IP
-        integer (IP)    :: final_ticks     = 0_IP  ! final value of the clock tick counter
-        integer (IP)    :: count_max       = 0_IP  ! maximum value of the clock counter
-        integer (IP)    :: count_rate      = 0_IP  ! number of clock ticks per second
-        integer (IP)    :: num_ticks       = 0_IP  ! number of clock ticks of the code
+        integer (ip)    :: initial_ticks   = 0_ip
+        integer (ip)    :: final_ticks     = 0_ip  ! final value of the clock tick counter
+        integer (ip)    :: count_max       = 0_ip  ! maximum value of the clock counter
+        integer (ip)    :: count_rate      = 0_ip  ! number of clock ticks per second
+        integer (ip)    :: num_ticks       = 0_ip  ! number of clock ticks of the code
         !---------------------------------------------------------------------------------
 
     contains
@@ -57,20 +57,20 @@ module type_CpuTimer
         !---------------------------------------------------------------------------------
         ! Public methods
         !---------------------------------------------------------------------------------
-        procedure, public         :: start => start_timer
-        procedure, public         :: stop  => stop_timer
-        procedure, public         :: get_total_time
-        procedure, public         :: get_elapsed_time
+        procedure, public          :: start => start_cputimer
+        procedure, public          :: stop  => stop_cputimer
+        procedure, public          :: get_total_time
+        procedure, public          :: get_elapsed_time
         procedure, public, nopass :: print_time_stamp
         !---------------------------------------------------------------------------------
         ! Private methods
         !---------------------------------------------------------------------------------
-        procedure                 :: create  => initialize_timer
-        procedure                 :: destroy => destruct_timer
+        procedure                 :: create  => initialize_cputimer
+        procedure                 :: destroy => destruct_cputimer
         !---------------------------------------------------------------------------------
         ! Finalizer
         !---------------------------------------------------------------------------------
-        final                     :: finalize_CpuTimer
+        final                     :: finalize_cputimer
         !---------------------------------------------------------------------------------
 
     end type CpuTimer
@@ -83,7 +83,7 @@ contains
     !
     !*****************************************************************************************
     !
-    subroutine start_timer( this )
+    subroutine start_cputimer( this )
         !
         !--------------------------------------------------------------------------------
         ! Dictionary: calling arguments
@@ -92,7 +92,7 @@ contains
         !--------------------------------------------------------------------------------
 
         ! Initialize timer
-        call this%Create()
+        call this%create()
 
         ! Set CPU start time
         call cpu_time( this%cpu_start_time )
@@ -103,11 +103,11 @@ contains
         ! Set timer status
         this%timer_started = .true.
 
-    end subroutine start_timer
+    end subroutine start_cputimer
     !
     !*****************************************************************************************
     !
-    subroutine stop_timer( this )
+    subroutine stop_cputimer( this )
         !
         !--------------------------------------------------------------------------------
         ! Dictionary: calling arguments
@@ -127,7 +127,7 @@ contains
         ! Set timer status
         this%timer_stopped = .true.
 
-    end subroutine stop_timer
+    end subroutine stop_cputimer
     !
     !*****************************************************************************************
     !
@@ -136,9 +136,9 @@ contains
         !--------------------------------------------------------------------------------
         ! Dictionary: calling arguments
         !--------------------------------------------------------------------------------
-        class (CpuTimer), intent (in out)        :: this
-        integer (IP),        intent (in), optional  :: units
-        real (WP)                                   :: return_value
+        class (CpuTimer),    intent (in out)        :: this
+        integer (ip),        intent (in), optional :: units
+        real (wp)                                    :: return_value
         !--------------------------------------------------------------------------------
 
         !--------------------------------------------------------------------------------
@@ -147,7 +147,7 @@ contains
 
         if ( .not.this%timer_started )     then
 
-            return_value = 0.0_WP
+            return_value = 0.0_wp
             return
 
         end if
@@ -182,11 +182,11 @@ contains
         if ( present( units ) )  then
 
             select case ( units )
-                case( REQUEST_TIME_IN_MINUTES )
+                case( request_time_in_minutes )
 
                     return_value = return_value / 60
 
-                case( REQUEST_TIME_IN_HOURS )
+                case( request_time_in_hours )
 
                     return_value = return_value / 3600
 
@@ -204,9 +204,9 @@ contains
         !--------------------------------------------------------------------------------
         ! Dictionary: calling arguments
         !--------------------------------------------------------------------------------
-        class (CpuTimer), intent (in out)        :: this
-        integer (IP),        intent (in), optional  :: units
-        real (WP)                                   :: return_value
+        class (CpuTimer), intent (in out)         :: this
+        integer (ip),     intent (in), optional  :: units
+        real (wp)                                  :: return_value
         !--------------------------------------------------------------------------------
 
         !--------------------------------------------------------------------------------
@@ -214,10 +214,8 @@ contains
         !--------------------------------------------------------------------------------
 
         if ( .not.this%timer_started )     then
-
-            return_value = 0.0_WP
+            return_value = 0.0_wp
             return
-
         end if
 
         !--------------------------------------------------------------------------------
@@ -244,12 +242,10 @@ contains
             num = final - initial
 
             if ( final < initial ) then
-
                 num = num + count_max
-
             end if
 
-            return_value = real( num, WP) / count_rate
+            return_value = real( num, wp) / count_rate
 
         end associate
 
@@ -258,21 +254,13 @@ contains
         !--------------------------------------------------------------------------------
 
         if ( present( units ) ) then
-
             select case ( units )
-
-                case( REQUEST_TIME_IN_MINUTES )
-
+                case( request_time_in_minutes )
                     return_value = return_value/ 60
-
-                case( REQUEST_TIME_IN_HOURS )
-
+                case( request_time_in_hours )
                     return_value = return_value/ 3600
-
                 case default
-
             end select
-
         end if
 
     end function get_elapsed_time
@@ -305,20 +293,20 @@ contains
         !--------------------------------------------------------------------------------
         ! Dictionary: calling arguments
         !--------------------------------------------------------------------------------
-        integer (IP), intent (in), optional :: file_unit
+        integer (ip), intent (in), optional :: file_unit
         !--------------------------------------------------------------------------------
         ! Dictionary: local variables
         !--------------------------------------------------------------------------------
-        integer (IP)                  :: values(8)
+        integer (ip)                  :: values(8)
         character (len=10)            :: time
         character (len=5)             :: zone
         character (len=8)             :: am_or_pm
         character (len=8)             :: date
-        character (len=9), parameter  :: LIST_OF_MONTHS(*) = [ &
+        character (len=9), parameter  :: list_of_months(*) = [ &
             'January  ', 'February ', 'March    ', 'April    ', &
             'May      ', 'June     ', 'July     ', 'August   ', &
             'September', 'October  ', 'November ', 'December ' ]
-        character (len=*), parameter  :: TIME_FORMAT = &
+        character (len=*), parameter  :: time_format = &
             '( A, 1X, I2, 1X, I4, 2X, I2, A1, I2.2, A1, I2.2, A1, I3.3, 1X, A)'
         !--------------------------------------------------------------------------------
 
@@ -369,7 +357,7 @@ contains
 
             if ( present( file_unit )) then
 
-                write ( file_unit, fmt =  TIME_FORMAT ) &
+                write ( file_unit, fmt =  time_format ) &
                     trim( LIST_OF_MONTHS( month ) ), &
                     day, year, hour, ':', &
                     minute, ':', second, '.', &
@@ -377,7 +365,7 @@ contains
 
             else
 
-                write ( stdout, fmt = TIME_FORMAT ) &
+                write ( stdout, fmt = time_format ) &
                     trim( LIST_OF_MONTHS( month ) ), &
                     day, year, hour, ':', &
                     minute, ':', second, '.', &
@@ -395,7 +383,7 @@ contains
     !
     !*****************************************************************************************
     !
-    subroutine initialize_timer( this )
+    subroutine initialize_cputimer( this )
         !
         !--------------------------------------------------------------------------------
         ! Dictionary: calling arguments
@@ -409,7 +397,7 @@ contains
 
         if ( this%initialized ) then
 
-            call this%Destroy()
+            call this%destroy()
 
         end if
 
@@ -418,15 +406,13 @@ contains
         ! Initialize counters
         !--------------------------------------------------------------------------------
 
-        call system_clock (&
-            count_rate = this%count_rate, &
-            count_max  = this%count_max )
+        call system_clock( count_rate = this%count_rate,  count_max  = this%count_max )
 
-    end subroutine initialize_timer
+    end subroutine initialize_cputimer
     !
     !*****************************************************************************************
     !
-    subroutine destruct_timer( this )
+    subroutine destruct_cputimer( this )
         !
         !--------------------------------------------------------------------------------
         ! Dictionary: calling arguments
@@ -452,24 +438,24 @@ contains
         ! Reset floats
         !---------------------------------------------------------------------------------
 
-        this%cpu_start_time  = 0.0_WP
-        this%cpu_finish_time = 0.0_WP
+        this%cpu_start_time  = 0.0_wp
+        this%cpu_finish_time = 0.0_wp
 
         !---------------------------------------------------------------------------------
         ! Reset integers
         !---------------------------------------------------------------------------------
 
-        this%initial_ticks   = 0_IP
-        this%final_ticks     = 0_IP
-        this%count_max       = 0_IP
-        this%count_rate      = 0_IP
-        this%num_ticks       = 0_IP
+        this%initial_ticks   = 0_ip
+        this%final_ticks     = 0_ip
+        this%count_max       = 0_ip
+        this%count_rate      = 0_ip
+        this%num_ticks       = 0_ip
 
-    end subroutine destruct_timer
+    end subroutine destruct_cputimer
     !
     !*****************************************************************************************
     !
-    subroutine finalize_CpuTimer( this )
+    subroutine finalize_cputimer( this )
         !
         !--------------------------------------------------------------------------------
         ! Dictionary: calling arguments
@@ -477,9 +463,9 @@ contains
         type (CpuTimer), intent (in out) :: this
         !--------------------------------------------------------------------------------
 
-        call this%Destroy()
+        call this%destroy()
 
-    end subroutine finalize_CpuTimer
+    end subroutine finalize_cputimer
     !
     !*****************************************************************************************
     !

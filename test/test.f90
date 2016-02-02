@@ -24,9 +24,11 @@
 program test
 
     use, intrinsic :: iso_fortran_env, only: &
-        WP     => REAL64, &
-        IP     => INT32, &
-        stdout => OUTPUT_UNIT
+        wp     => REAL64, &
+        ip     => INT32, &
+        stdout => OUTPUT_UNIT, &
+        compiler_version, &
+        compiler_options
 
     use type_CpuTimer, only: &
         CpuTimer
@@ -34,13 +36,13 @@ program test
     ! Explicit typing only
     implicit none
     
-    call Main_test()
+    call test_all()
     
 contains
     !
     !*****************************************************************************************
     !
-    subroutine Main_test()
+    subroutine test_all()
         !
         !---------------------------------------------------------------------------------
         ! Dictionary: local variables
@@ -48,8 +50,8 @@ contains
         type (CpuTimer)      :: timer
         !---------------------------------------------------------------------------------
 
-        ! Print time stamp
-        call timer%Print_time_stamp()
+        ! print time stamp
+        call timer%print_time_stamp()
 
         write ( stdout, '(A)' ) ' '
         write ( stdout, '(A)' ) '*********************************************'
@@ -57,11 +59,11 @@ contains
         write ( stdout, '(A)' ) '  Demonstrates usage of TYPE (CpuTimer).'
         write ( stdout, '(A)' ) ' '
 
-        call Time_random_number_routine ()
-        call Time_vectorized_EXP_routine ()
-        call Time_unvectorized_EXP_routine ()
-        call Time_2D_nearest_neighbor_problem ()
-        call Time_matrix_multiplication_problem ()
+        call time_random_number_routine ()
+        call time_vectorized_exp_routine ()
+        call time_unvectorized_exp_routine ()
+        call time_2d_nearest_neighbor_problem ()
+        call time_matrix_multiplication_problem ()
         !
         !  Terminate.
         !
@@ -71,14 +73,24 @@ contains
 
         write ( stdout, '(A)' ) ' '
 
-        ! Print time stamp
-        call timer%Print_time_stamp()
+        ! print time stamp
+        call timer%print_time_stamp()
 
-    end subroutine Main_test
+        !--------------------------------------------------------------------------------
+        ! print compiler info
+        !--------------------------------------------------------------------------------
+
+        write( stdout, '(A)' ) ' '
+        write( stdout, '(4A)' ) 'This file was compiled by ', &
+            compiler_version(), ' using the options ', &
+            compiler_options()
+        write( stdout, '(A)' ) ' '
+
+    end subroutine test_all
     !
     !*****************************************************************************************
     !
-    subroutine Time_random_number_routine ()
+    subroutine time_random_number_routine ()
         !
         !< Purpose:
         !
@@ -102,14 +114,14 @@ contains
         ! Dictionary: local variables
         !---------------------------------------------------------------------------------
         type (CpuTimer)      :: timer
-        integer (IP)            :: n_log, rep   !! Counters
-        integer (IP), parameter :: N_LOG_MIN = 0
-        integer (IP), parameter :: N_LOG_MAX = 20
-        integer (IP), parameter :: N_MIN     = 2**N_LOG_MIN
-        integer (IP), parameter :: N_MAX     = 2**N_LOG_MAX
-        integer (IP), parameter :: REP_NUM   = 5
-        real (WP)               :: delta( N_LOG_MIN:N_LOG_MAX, REP_NUM + 3)
-        real (WP)               :: x( N_MAX )
+        integer (ip)            :: n_log, rep   !! Counters
+        integer (ip), parameter :: N_LOG_MIN = 0
+        integer (ip), parameter :: N_LOG_MAX = 20
+        integer (ip), parameter :: N_MIN     = 2**N_LOG_MIN
+        integer (ip), parameter :: N_MAX     = 2**N_LOG_MAX
+        integer (ip), parameter :: REP_NUM   = 5
+        real (wp)               :: delta( N_LOG_MIN:N_LOG_MAX, REP_NUM + 3)
+        real (wp)               :: x( N_MAX )
         !---------------------------------------------------------------------------------
 
         write ( stdout, '(A)' )     ' '
@@ -130,16 +142,16 @@ contains
 
                 associate( n => 2**( n_log ) )
 
-                    ! Start timer
-                    call timer%Start()
+                    ! start timer
+                    call timer%start()
 
                     call random_number( harvest = x(1:n) )
 
-                    ! Stop timer
-                    call timer%Stop()
+                    ! stop timer
+                    call timer%stop()
 
                     ! Set CPU time
-                    delta( n_log, rep ) = timer%Get_total_time()
+                    delta( n_log, rep ) = timer%get_total_time()
 
                 end associate
 
@@ -168,11 +180,11 @@ contains
             end associate
         end do
 
-    end subroutine Time_random_number_routine
+    end subroutine time_random_number_routine
     !
     !*****************************************************************************************
     !
-    subroutine Time_vectorized_EXP_routine()
+    subroutine time_vectorized_exp_routine()
         !
         !< Purpose:
         !
@@ -196,16 +208,16 @@ contains
         ! Dictionary: local variables
         !--------------------------------------------------------------------------------
         type (CpuTimer)       :: timer
-        integer (IP)             :: func, i_rep, n_log !! Counters
-        integer (IP), parameter  :: N_LOG_MIN = 12
-        integer (IP), parameter  :: N_LOG_MAX = 22
-        integer (IP), parameter  :: N_MIN     = 2**N_LOG_MIN
-        integer (IP), parameter  :: N_MAX     = 2**N_LOG_MAX
-        integer (IP), parameter  :: N_REP     = 5
-        real (WP),    parameter  :: PI        = acos( -1.0_WP )
-        real (WP)                :: delta( N_LOG_MAX, N_REP )
-        real (WP)                :: x( N_MAX )
-        real (WP)                :: y( N_MAX )
+        integer (ip)             :: func, i_rep, n_log !! Counters
+        integer (ip), parameter  :: N_LOG_MIN = 12
+        integer (ip), parameter  :: N_LOG_MAX = 22
+        integer (ip), parameter  :: N_MIN     = 2**N_LOG_MIN
+        integer (ip), parameter  :: N_MAX     = 2**N_LOG_MAX
+        integer (ip), parameter  :: N_REP     = 5
+        real (wp),    parameter  :: PI        = acos( -1.0_wp )
+        real (wp)                :: delta( N_LOG_MAX, N_REP )
+        real (wp)                :: x( N_MAX )
+        real (wp)                :: y( N_MAX )
         !--------------------------------------------------------------------------------
 
         write ( stdout, '(A)' ) ' '
@@ -230,10 +242,10 @@ contains
 
                     associate( n => 2**( n_log ) )
 
-                        call random_number ( harvest = x(1:n) )
+                        call random_number( harvest = x(1:n) )
 
-                        ! Start timer
-                        call timer%Start()
+                        ! start timer
+                        call timer%start()
 
                         ! First function
                         if ( func == 1 ) then
@@ -259,11 +271,11 @@ contains
 
                     end associate
 
-                    ! Stop the timer
-                    call timer%Stop()
+                    ! stop the timer
+                    call timer%stop()
 
                     ! Set CPU time
-                    delta( n_log, i_rep ) = timer%Get_total_time()
+                    delta( n_log, i_rep ) = timer%get_total_time()
 
                 end do
 
@@ -289,11 +301,11 @@ contains
             end do
         end do
 
-    end subroutine Time_vectorized_EXP_routine
+    end subroutine time_vectorized_exp_routine
     !
     !*****************************************************************************************
     !
-    subroutine Time_unvectorized_EXP_routine ()
+    subroutine time_unvectorized_exp_routine ()
         !
         !< Purpose:
         !
@@ -317,16 +329,16 @@ contains
         ! Dictionary: local variables
         !--------------------------------------------------------------------------------
         type (CpuTimer)       :: timer
-        integer (IP)             :: func, i, i_rep, n_log !! Counters
-        integer (IP), parameter  :: N_LOG_MIN = 12
-        integer (IP), parameter  :: N_LOG_MAX = 22
-        integer (IP), parameter  :: N_MIN     = 2**N_LOG_MIN
-        integer (IP), parameter  :: N_MAX     = 2**N_LOG_MAX
-        integer (IP), parameter  :: N_REP     = 5
-        real (WP),    parameter  :: PI        = acos( -1.0_WP )
-        real (WP)                :: delta( N_LOG_MAX, N_REP )
-        real (WP)                :: x(N_MAX)
-        real (WP)                :: y(N_MAX)
+        integer (ip)             :: func, i, i_rep, n_log !! Counters
+        integer (ip), parameter  :: N_LOG_MIN = 12
+        integer (ip), parameter  :: N_LOG_MAX = 22
+        integer (ip), parameter  :: N_MIN     = 2**N_LOG_MIN
+        integer (ip), parameter  :: N_MAX     = 2**N_LOG_MAX
+        integer (ip), parameter  :: N_REP     = 5
+        real (wp),    parameter  :: PI        = acos( -1.0_wp )
+        real (wp)                :: delta( N_LOG_MAX, N_REP )
+        real (wp)                :: x(N_MAX)
+        real (wp)                :: y(N_MAX)
         !--------------------------------------------------------------------------------
 
         write ( stdout, '(A)' ) ' '
@@ -351,10 +363,10 @@ contains
 
                     associate( n => 2**( n_log ))
 
-                        call random_number ( harvest = x(1:n) )
+                        call random_number( harvest = x(1:n) )
 
-                        ! Start timer
-                        call timer%Start()
+                        ! start timer
+                        call timer%start()
 
                         ! First function
                         if ( func == 1 ) then
@@ -388,11 +400,11 @@ contains
 
                     end associate
 
-                    ! Stop timer
-                    call timer%Stop()
+                    ! stop timer
+                    call timer%stop()
 
                     ! Set CPU time
-                    delta( n_log, i_rep ) = timer%Get_total_time()
+                    delta( n_log, i_rep ) = timer%get_total_time()
 
                 end do
             end do
@@ -418,11 +430,11 @@ contains
 
         end do loop_over_functions
 
-    end subroutine Time_unvectorized_EXP_routine
+    end subroutine time_unvectorized_exp_routine
     !
     !*****************************************************************************************
     !
-    subroutine Time_2D_nearest_neighbor_problem()
+    subroutine time_2d_nearest_neighbor_problem()
         !
         !< Purpose:
         !
@@ -446,17 +458,17 @@ contains
         ! Dictionary: local variables
         !--------------------------------------------------------------------------------
         type (CpuTimer)      :: timer
-        integer (IP)            :: i, i_rep, n_log !! Counters
-        integer (IP)            :: i_min
-        integer (IP), parameter :: N_LOG_MIN = 10
-        integer (IP), parameter :: N_LOG_MAX = 20
-        integer (IP), parameter :: N_MIN     = 2**N_LOG_MIN
-        integer (IP), parameter :: N_MAX     = 2**N_LOG_MAX
-        integer (IP), parameter :: N_REP     = 5
-        real (WP)               :: delta( N_LOG_MAX, N_REP )
-        real (WP)               :: x( 2, N_MAX )
-        real (WP)               :: y( 2 )
-        real (WP)               :: dist_i, dist_min
+        integer (ip)            :: i, i_rep, n_log !! Counters
+        integer (ip)            :: i_min
+        integer (ip), parameter :: N_LOG_MIN = 10
+        integer (ip), parameter :: N_LOG_MAX = 20
+        integer (ip), parameter :: N_MIN     = 2**N_LOG_MIN
+        integer (ip), parameter :: N_MAX     = 2**N_LOG_MAX
+        integer (ip), parameter :: N_REP     = 5
+        real (wp)               :: delta( N_LOG_MAX, N_REP )
+        real (wp)               :: x( 2, N_MAX )
+        real (wp)               :: y( 2 )
+        real (wp)               :: dist_i, dist_min
         !--------------------------------------------------------------------------------
 
         write ( stdout, '(A)' ) ' '
@@ -476,16 +488,16 @@ contains
         write ( stdout, '(A, I12)' ) '  Data vectors will be of maximum size ',    N_MAX
         write ( stdout, '(A, I12)' ) '  Number of repetitions of the operation: ', N_REP
 
-        call random_number ( harvest = x(1:2,1:N_MAX) )
-        call random_number ( harvest = y(1:2) )
+        call random_number( harvest = x(1:2,1:N_MAX) )
+        call random_number( harvest = y(1:2) )
 
         do i_rep = 1, N_REP
             do n_log = N_LOG_MIN, N_LOG_MAX
 
                 associate( n => 2**( n_log ) )
 
-                    ! Start timer
-                    call timer%Start()
+                    ! start timer
+                    call timer%start()
 
                     dist_min = huge ( dist_min )
                     i_min = 0
@@ -502,11 +514,11 @@ contains
 
                     end do
 
-                    ! Stop timer
-                    call timer%Stop()
+                    ! stop timer
+                    call timer%stop()
 
                     ! Set CPU time
-                    delta( n_log, i_rep ) = timer%Get_total_time()
+                    delta( n_log, i_rep ) = timer%get_total_time()
 
                 end associate
             end do
@@ -530,11 +542,11 @@ contains
 
         end do
 
-    end subroutine Time_2D_nearest_neighbor_problem
+    end subroutine time_2d_nearest_neighbor_problem
     !
     !*****************************************************************************************
     !
-    subroutine Time_matrix_multiplication_problem()
+    subroutine time_matrix_multiplication_problem()
         !
         !< Purpose:
         !
@@ -557,18 +569,18 @@ contains
         !--------------------------------------------------------------------------------
         ! Dictionary: local variables
         !--------------------------------------------------------------------------------
-        type (CpuTimer)        :: timer
-        integer (IP)              :: i, j, k    !! Counters
-        integer (IP)              :: l_log, rep !! Counters
-        integer (IP), parameter   :: L_LOG_MIN = 1
-        integer (IP), parameter   :: L_LOG_MAX = 5
-        integer (IP), parameter   :: L_MIN     = 4**L_LOG_MIN
-        integer (IP), parameter   :: L_MAX     = 4**L_LOG_MAX
-        integer (IP), parameter   :: REP_NUM   = 5
-        real (WP),    allocatable :: a(:,:)
-        real (WP),    allocatable :: b(:,:)
-        real (WP),    allocatable :: c(:,:)
-        real (WP)                 :: delta( L_LOG_MIN:L_LOG_MAX, 1:REP_NUM )
+        type (CpuTimer)             :: timer
+        integer (ip)                :: i, j, k    !! Counters
+        integer (ip)                :: l_log, rep !! Counters
+        integer (ip), parameter    :: L_LOG_MIN = 1
+        integer (ip), parameter    :: L_LOG_MAX = 5
+        integer (ip), parameter    :: L_MIN     = 4**L_LOG_MIN
+        integer (ip), parameter    :: L_MAX     = 4**L_LOG_MAX
+        integer (ip), parameter    :: REP_NUM   = 5
+        real (wp),    allocatable  :: a(:,:)
+        real (wp),    allocatable  :: b(:,:)
+        real (wp),    allocatable  :: c(:,:)
+        real (wp)                   :: delta( L_LOG_MIN:L_LOG_MAX, 1:REP_NUM )
         !--------------------------------------------------------------------------------
 
         write ( stdout, '(A)' ) ' '
@@ -602,26 +614,26 @@ contains
                     allocate ( b(1:l,1:l) )
                     allocate ( c(1:l,1:l) )
 
-                    call random_number ( harvest = a(1:l,1:l) )
-                    call random_number ( harvest = b(1:l,1:l) )
+                    call random_number( harvest = a(1:l,1:l) )
+                    call random_number( harvest = b(1:l,1:l) )
 
-                    ! Start timer
-                    call timer%Start()
+                    ! start timer
+                    call timer%start()
 
                     do i = 1, l
                         do j = 1, l
-                            c(i,j) = 0.0_WP
+                            c(i,j) = 0.0_wp
                             do k = 1, l
                                 c(i,j) = c(i,j) + a(i,k) * b(k,j)
                             end do
                         end do
                     end do
 
-                    ! Stop timer
-                    call timer%Stop()
+                    ! stop timer
+                    call timer%stop()
 
                     ! Get CPU time
-                    delta( l_log, rep ) = timer%Get_total_time()
+                    delta( l_log, rep ) = timer%get_total_time()
 
                     deallocate ( a )
                     deallocate ( b )
@@ -661,19 +673,19 @@ contains
                     allocate ( b(1:l,1:l) )
                     allocate ( c(1:l,1:l) )
 
-                    call random_number ( harvest = a(1:l,1:l) )
-                    call random_number ( harvest = b(1:l,1:l) )
+                    call random_number( harvest = a(1:l,1:l) )
+                    call random_number( harvest = b(1:l,1:l) )
 
-                    ! Start timer
-                    call timer%Start()
+                    ! start timer
+                    call timer%start()
 
-                    c = matmul ( a, b )
+                    c = matmul( a, b )
 
-                    ! Stop timer
-                    call timer%Stop()
+                    ! stop timer
+                    call timer%stop()
 
                     ! Set CPU time
-                    delta( l_log, rep ) = timer%Get_total_time()
+                    delta( l_log, rep ) = timer%get_total_time()
 
                     deallocate ( a )
                     deallocate ( b )
@@ -699,7 +711,7 @@ contains
             end associate
         end do
 
-    end subroutine Time_matrix_multiplication_problem
+    end subroutine time_matrix_multiplication_problem
     !
     !*****************************************************************************************
     !

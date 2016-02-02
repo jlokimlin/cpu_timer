@@ -24,18 +24,11 @@ $(ERROR_WARNING_OPTIONS) \
 $(CODE_GENERATION_OPTIONS)
 
 LANGUAGE_OPTIONS = \
--fimplicit-none \
--fdefault-real-8 \
--fdefault-double-8
+-fimplicit-none
 
 ERROR_WARNING_OPTIONS = \
 -Wall
 
 CODE_GENERATION_OPTIONS = \
--fcheck=all \
--fbounds-check \
--fno-backtrace \
--fno-unsafe-math-optimizations \
--frounding-math \
--fsignaling-nans
+-fcheck=all
 
