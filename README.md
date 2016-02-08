@@ -7,8 +7,8 @@ An object-oriented approach for timing program execution in modern Fortran.
 ```fortran
 
 use, intrinsic :: iso_fortran_env, only: &
-    wp     => REAL64, &
-    ip     => INT32
+    wp => REAL64, &
+    ip => INT32
 
 use type_CpuTimer, only: &
     CpuTimer
@@ -35,7 +35,7 @@ wall_clock_time = timer%get_elapsed_time( UNITS )
 
 total_processor_time = timer%get_total_cpu_time( UNITS )
 
-!* Get time stamp
+!* Put a time stamp
 
 call timer%print_time_stamp()
 
