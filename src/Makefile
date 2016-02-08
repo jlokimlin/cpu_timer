@@ -1,20 +1,16 @@
 
 include ../make.inc
 
-#EXTERNAL_LIBRARY_PATH = /usr/local/lib
-EXTERNAL_LIBRARY_PATH = /usr/local/lib64
-
-BIN_PATH = /usr/local/bin
-
 LINKS = \
--I$(OBJ_DIRECTORY)
+-I$(OBJ_DIRECTORY) \
+-I$(LIB_DIRECTORY)
 
 EXECUTABLE = ./exe
 
 type_cputimer.o: \
 type_cputimer.f90
 	$(FC) $(FFLAGS) -c type_cputimer.f90 $(LINKS) \
-	 -o $(OBJ_DIRECTORY)/$@ -J$(OBJ_DIRECTORY)
+	 -o $(OBJ_DIRECTORY)/$@ -J$(LIB_DIRECTORY)
 
 main.o: \
 type_cputimer.o \
@@ -35,5 +31,5 @@ all:
 	make lib
 
 clean:
-	rm -f $(OBJ_DIRECTORY)/*.o $(OBJ_DIRECTORY)/*.mod $(LIB_DIRECTORY)/*.a
+	rm -f $(OBJ_DIRECTORY)/*.o $(LIB_DIRECTORY)/*.mod $(LIB_DIRECTORY)/*.a
 	rm -f $(EXECUTABLE)

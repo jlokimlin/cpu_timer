@@ -9,7 +9,8 @@ module type_CpuTimer
     use, intrinsic :: iso_fortran_env, only: &
         wp     => REAL64, &
         ip     => INT32, &
-        stdout => OUTPUT_UNIT
+        stdout => OUTPUT_UNIT, &
+        stderr => ERROR_UNIT
 
     ! Explicit typing only
     implicit none
@@ -21,9 +22,9 @@ module type_CpuTimer
     !---------------------------------------------------------------------------------
     ! Dictionary: global variables confined to the module
     !---------------------------------------------------------------------------------
-    integer (ip), parameter  :: request_time_in_seconds = 0_ip
-    integer (ip), parameter  :: request_time_in_minutes = 1_ip
-    integer (ip), parameter  :: request_time_in_hours   = 2_ip
+    integer (ip), parameter  :: REQUEST_TIME_IN_SECONDS = 0_ip
+    integer (ip), parameter  :: REQUEST_TIME_IN_MINUTES = 1_ip
+    integer (ip), parameter  :: REQUEST_TIME_IN_HOURS   = 2_ip
     !---------------------------------------------------------------------------------
 
     ! Declare derived data type
@@ -59,9 +60,9 @@ module type_CpuTimer
         !---------------------------------------------------------------------------------
         procedure, public          :: start => start_cputimer
         procedure, public          :: stop  => stop_cputimer
-        procedure, public          :: get_total_time
+        procedure, public          :: get_total_cpu_time
         procedure, public          :: get_elapsed_time
-        procedure, public, nopass :: print_time_stamp
+        procedure, public, nopass  :: print_time_stamp
         !---------------------------------------------------------------------------------
         ! Private methods
         !---------------------------------------------------------------------------------
@@ -131,7 +132,7 @@ contains
     !
     !*****************************************************************************************
     !
-    function get_total_time( this, units ) result( return_value )
+    function get_total_cpu_time( this, units ) result( return_value )
         !
         !--------------------------------------------------------------------------------
         ! Dictionary: calling arguments
@@ -182,11 +183,11 @@ contains
         if ( present( units ) )  then
 
             select case ( units )
-                case( request_time_in_minutes )
+                case( REQUEST_TIME_IN_MINUTES )
 
                     return_value = return_value / 60
 
-                case( request_time_in_hours )
+                case( REQUEST_TIME_IN_HOURS )
 
                     return_value = return_value / 3600
 
@@ -195,7 +196,7 @@ contains
             end select
         end if
 
-    end function get_total_time
+    end function get_total_cpu_time
     !
     !*****************************************************************************************
     !
@@ -205,8 +206,8 @@ contains
         ! Dictionary: calling arguments
         !--------------------------------------------------------------------------------
         class (CpuTimer), intent (in out)         :: this
-        integer (ip),     intent (in), optional  :: units
-        real (wp)                                  :: return_value
+        integer (ip),     intent (in), optional   :: units
+        real (wp)                                 :: return_value
         !--------------------------------------------------------------------------------
 
         !--------------------------------------------------------------------------------
@@ -255,11 +256,14 @@ contains
 
         if ( present( units ) ) then
             select case ( units )
-                case( request_time_in_minutes )
+                case( REQUEST_TIME_IN_MINUTES )
                     return_value = return_value/ 60
-                case( request_time_in_hours )
+                case( REQUEST_TIME_IN_HOURS )
                     return_value = return_value/ 3600
                 case default
+                    write( stderr, '(A)') 'TYPE(CpuTimer)'
+                    write( stderr, '(A)' ) 'Invalid calling argument for UNITS'
+                    write( stderr, '(A)' ) 'must be either 0, 1, or 2'
             end select
         end if
 

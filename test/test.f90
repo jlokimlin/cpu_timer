@@ -113,7 +113,7 @@ contains
         !---------------------------------------------------------------------------------
         ! Dictionary: local variables
         !---------------------------------------------------------------------------------
-        type (CpuTimer)      :: timer
+        type (CpuTimer)         :: timer
         integer (ip)            :: n_log, rep   !! Counters
         integer (ip), parameter :: N_LOG_MIN = 0
         integer (ip), parameter :: N_LOG_MAX = 20
@@ -151,7 +151,7 @@ contains
                     call timer%stop()
 
                     ! Set CPU time
-                    delta( n_log, rep ) = timer%get_total_time()
+                    delta( n_log, rep ) = timer%get_total_cpu_time()
 
                 end associate
 
@@ -207,7 +207,7 @@ contains
         !--------------------------------------------------------------------------------
         ! Dictionary: local variables
         !--------------------------------------------------------------------------------
-        type (CpuTimer)       :: timer
+        type (CpuTimer)          :: timer
         integer (ip)             :: func, i_rep, n_log !! Counters
         integer (ip), parameter  :: N_LOG_MIN = 12
         integer (ip), parameter  :: N_LOG_MAX = 22
@@ -275,7 +275,7 @@ contains
                     call timer%stop()
 
                     ! Set CPU time
-                    delta( n_log, i_rep ) = timer%get_total_time()
+                    delta( n_log, i_rep ) = timer%get_total_cpu_time()
 
                 end do
 
@@ -328,7 +328,7 @@ contains
         !--------------------------------------------------------------------------------
         ! Dictionary: local variables
         !--------------------------------------------------------------------------------
-        type (CpuTimer)       :: timer
+        type (CpuTimer)          :: timer
         integer (ip)             :: func, i, i_rep, n_log !! Counters
         integer (ip), parameter  :: N_LOG_MIN = 12
         integer (ip), parameter  :: N_LOG_MAX = 22
@@ -404,7 +404,7 @@ contains
                     call timer%stop()
 
                     ! Set CPU time
-                    delta( n_log, i_rep ) = timer%get_total_time()
+                    delta( n_log, i_rep ) = timer%get_total_cpu_time()
 
                 end do
             end do
@@ -457,7 +457,7 @@ contains
         !--------------------------------------------------------------------------------
         ! Dictionary: local variables
         !--------------------------------------------------------------------------------
-        type (CpuTimer)      :: timer
+        type (CpuTimer)         :: timer
         integer (ip)            :: i, i_rep, n_log !! Counters
         integer (ip)            :: i_min
         integer (ip), parameter :: N_LOG_MIN = 10
@@ -518,7 +518,7 @@ contains
                     call timer%stop()
 
                     ! Set CPU time
-                    delta( n_log, i_rep ) = timer%get_total_time()
+                    delta( n_log, i_rep ) = timer%get_total_cpu_time()
 
                 end associate
             end do
@@ -569,9 +569,9 @@ contains
         !--------------------------------------------------------------------------------
         ! Dictionary: local variables
         !--------------------------------------------------------------------------------
-        type (CpuTimer)             :: timer
-        integer (ip)                :: i, j, k    !! Counters
-        integer (ip)                :: l_log, rep !! Counters
+        type (CpuTimer)            :: timer
+        integer (ip)               :: i, j, k    !! Counters
+        integer (ip)               :: l_log, rep !! Counters
         integer (ip), parameter    :: L_LOG_MIN = 1
         integer (ip), parameter    :: L_LOG_MAX = 5
         integer (ip), parameter    :: L_MIN     = 4**L_LOG_MIN
@@ -580,7 +580,7 @@ contains
         real (wp),    allocatable  :: a(:,:)
         real (wp),    allocatable  :: b(:,:)
         real (wp),    allocatable  :: c(:,:)
-        real (wp)                   :: delta( L_LOG_MIN:L_LOG_MAX, 1:REP_NUM )
+        real (wp)                  :: delta( L_LOG_MIN:L_LOG_MAX, 1:REP_NUM )
         !--------------------------------------------------------------------------------
 
         write ( stdout, '(A)' ) ' '
@@ -633,7 +633,7 @@ contains
                     call timer%stop()
 
                     ! Get CPU time
-                    delta( l_log, rep ) = timer%get_total_time()
+                    delta( l_log, rep ) = timer%get_total_cpu_time()
 
                     deallocate ( a )
                     deallocate ( b )
@@ -685,7 +685,7 @@ contains
                     call timer%stop()
 
                     ! Set CPU time
-                    delta( l_log, rep ) = timer%get_total_time()
+                    delta( l_log, rep ) = timer%get_total_cpu_time()
 
                     deallocate ( a )
                     deallocate ( b )
