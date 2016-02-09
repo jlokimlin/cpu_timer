@@ -7,13 +7,13 @@ LINKS = \
 
 EXECUTABLE = ./exe
 
-type_cputimer.o: \
-type_cputimer.f90
-	$(FC) $(FFLAGS) -c type_cputimer.f90 $(LINKS) \
+type_CpuTimer.o: \
+type_CpuTimer.f90
+	$(FC) $(FFLAGS) -c type_CpuTimer.f90 $(LINKS) \
 	 -o $(OBJ_DIRECTORY)/$@ -J$(LIB_DIRECTORY)
 
 main.o: \
-type_cputimer.o \
+type_CpuTimer.o \
 main.f90
 	$(FC) $(FFLAGS) -c main.f90 $(LINKS) \
 	-o $(OBJ_DIRECTORY)/$@
