@@ -30,48 +30,37 @@ module type_CpuTimer
     ! Declare derived data type
     type, public :: CpuTimer
 
-        ! All components are private unless stated otherwise
-        private
-
         !---------------------------------------------------------------------------------
-        ! Timer status flags
+        ! Class variables
         !---------------------------------------------------------------------------------
-        logical         :: initialized     = .false.
-        logical         :: timer_started   = .false.
-        logical         :: timer_stopped   = .false.
-        !---------------------------------------------------------------------------------
-        real (wp)       :: cpu_start_time  = 0.0_wp
-        real (wp)       :: cpu_finish_time = 0.0_wp
-        !---------------------------------------------------------------------------------
-        integer (ip)    :: initial_ticks   = 0_ip
-        integer (ip)    :: final_ticks     = 0_ip  ! final value of the clock tick counter
-        integer (ip)    :: count_max       = 0_ip  ! maximum value of the clock counter
-        integer (ip)    :: count_rate      = 0_ip  ! number of clock ticks per second
-        integer (ip)    :: num_ticks       = 0_ip  ! number of clock ticks of the code
+        logical,      private   :: initialized     = .false.
+        logical,      private   :: timer_started   = .false.
+        logical,      private   :: timer_stopped   = .false.
+        real (wp),    private   :: cpu_start_time  = 0.0_wp
+        real (wp),    private   :: cpu_finish_time = 0.0_wp
+        integer (ip), private   :: initial_ticks   = 0_ip
+        integer (ip), private   :: final_ticks     = 0_ip  ! final value of the clock tick counter
+        integer (ip), private   :: count_max       = 0_ip  ! maximum value of the clock counter
+        integer (ip), private   :: count_rate      = 0_ip  ! number of clock ticks per second
+        integer (ip), private   :: num_ticks       = 0_ip  ! number of clock ticks of the code
         !---------------------------------------------------------------------------------
 
     contains
 
-        ! All methods are private unless stated otherwise
-        private
-
         !---------------------------------------------------------------------------------
-        ! Public methods
+        ! Class methods
         !---------------------------------------------------------------------------------
-        procedure, public          :: start => start_cputimer
-        procedure, public          :: stop  => stop_cputimer
+        procedure, public          :: start => start_cpu_timer
+        procedure, public          :: stop  => stop_cpu_timer
         procedure, public          :: get_total_cpu_time
         procedure, public          :: get_elapsed_time
         procedure, public, nopass  :: print_time_stamp
-        !---------------------------------------------------------------------------------
-        ! Private methods
-        !---------------------------------------------------------------------------------
-        procedure                 :: create  => initialize_cputimer
-        procedure                 :: destroy => destruct_cputimer
+        procedure, private         :: create  => initialize_cpu_timer
+        procedure, private         :: destroy => destruct_cpu_timer
         !---------------------------------------------------------------------------------
         ! Finalizer
         !---------------------------------------------------------------------------------
-        final                     :: finalize_cputimer
+        final                      :: finalize_cpu_timer
         !---------------------------------------------------------------------------------
 
     end type CpuTimer
@@ -80,11 +69,7 @@ contains
     !
     !*****************************************************************************************
     !
-    ! Public methods
-    !
-    !*****************************************************************************************
-    !
-    subroutine start_cputimer( this )
+    subroutine start_cpu_timer( this )
         !
         !--------------------------------------------------------------------------------
         ! Dictionary: calling arguments
@@ -104,11 +89,11 @@ contains
         ! Set timer status
         this%timer_started = .true.
 
-    end subroutine start_cputimer
+    end subroutine start_cpu_timer
     !
     !*****************************************************************************************
     !
-    subroutine stop_cputimer( this )
+    subroutine stop_cpu_timer( this )
         !
         !--------------------------------------------------------------------------------
         ! Dictionary: calling arguments
@@ -128,7 +113,7 @@ contains
         ! Set timer status
         this%timer_stopped = .true.
 
-    end subroutine stop_cputimer
+    end subroutine stop_cpu_timer
     !
     !*****************************************************************************************
     !
@@ -139,7 +124,7 @@ contains
         !--------------------------------------------------------------------------------
         class (CpuTimer),    intent (in out)        :: this
         integer (ip),        intent (in), optional :: units
-        real (wp)                                    :: return_value
+        real (wp)                                  :: return_value
         !--------------------------------------------------------------------------------
 
         !--------------------------------------------------------------------------------
@@ -180,19 +165,16 @@ contains
         ! Convert to requested units if present
         !--------------------------------------------------------------------------------
 
-        if ( present( units ) )  then
-
+        if ( present( units ) ) then
             select case ( units )
                 case( REQUEST_TIME_IN_MINUTES )
-
-                    return_value = return_value / 60
-
+                    return_value = return_value/ 60
                 case( REQUEST_TIME_IN_HOURS )
-
-                    return_value = return_value / 3600
-
+                    return_value = return_value/ 3600
                 case default
-
+                    write( stderr, '(A)') 'TYPE(CpuTimer)'
+                    write( stderr, '(A)' ) 'Invalid calling argument for UNITS'
+                    write( stderr, '(A)' ) 'must be either 0, 1, or 2'
             end select
         end if
 
@@ -387,7 +369,7 @@ contains
     !
     !*****************************************************************************************
     !
-    subroutine initialize_cputimer( this )
+    subroutine initialize_cpu_timer( this )
         !
         !--------------------------------------------------------------------------------
         ! Dictionary: calling arguments
@@ -412,11 +394,11 @@ contains
 
         call system_clock( count_rate = this%count_rate,  count_max  = this%count_max )
 
-    end subroutine initialize_cputimer
+    end subroutine initialize_cpu_timer
     !
     !*****************************************************************************************
     !
-    subroutine destruct_cputimer( this )
+    subroutine destruct_cpu_timer( this )
         !
         !--------------------------------------------------------------------------------
         ! Dictionary: calling arguments
@@ -455,11 +437,11 @@ contains
         this%count_rate      = 0_ip
         this%num_ticks       = 0_ip
 
-    end subroutine destruct_cputimer
+    end subroutine destruct_cpu_timer
     !
     !*****************************************************************************************
     !
-    subroutine finalize_cputimer( this )
+    subroutine finalize_cpu_timer( this )
         !
         !--------------------------------------------------------------------------------
         ! Dictionary: calling arguments
@@ -469,7 +451,7 @@ contains
 
         call this%destroy()
 
-    end subroutine finalize_cputimer
+    end subroutine finalize_cpu_timer
     !
     !*****************************************************************************************
     !
