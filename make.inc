@@ -1,4 +1,10 @@
 
+LIB = ../lib/libcpu_timer.a
+
+AR = /usr/bin/ar
+
+MAKE = /usr/bin/make
+
 # Set directories
 
 #EXTERNAL_LIBRARY_PATH = /usr/local/lib
@@ -8,15 +14,15 @@ BIN_PATH = /usr/local/bin
 
 SRC_DIRECTORY = ./
 
-SOURCES = $(wildcard $(SRC_DIRECTORY)/*.f90)
+SRC= $(wildcard $(SRC_DIRECTORY)/*.f90)
 
-OBJECTS := $(patsubst %.f90, %.o, $(wildcard *.f90))
+OBJ := $(patsubst %.f90, %.o, $(wildcard *.f90))
 
 OBJ_DIRECTORY = ../objs
 
 LIB_DIRECTORY = ../lib
 
-OBJECTS_WITH_PREFIX = $(addprefix $(OBJ_DIRECTORY)/, $(OBJECTS))
+OBJS = $(addprefix $(OBJ_DIRECTORY)/, $(OBJ))
 
 # Set compiler options
 

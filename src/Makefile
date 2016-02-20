@@ -5,7 +5,7 @@ LINKS = \
 -I$(OBJ_DIRECTORY) \
 -I$(LIB_DIRECTORY)
 
-EXECUTABLE = ./exe
+EXECUTABLE = ./build_lib.exe
 
 type_CpuTimer.o: \
 type_CpuTimer.f90
@@ -18,8 +18,8 @@ main.f90
 	$(FC) $(FFLAGS) -c main.f90 $(LINKS) \
 	-o $(OBJ_DIRECTORY)/$@
 
-exec: $(OBJECTS)
-	$(FC) $(FFLAGS) -o $(EXECUTABLE) $(OBJECTS_WITH_PREFIX) $(LINKS)
+exec: $(OBJ)
+	$(FC) $(FFLAGS) -o $(EXECUTABLE) $(OBJS) $(LINKS)
 
 lib: 
 	ar rc libcpu_timer.a $(OBJ_DIRECTORY)/*.o
@@ -27,9 +27,9 @@ lib:
 
 all:
 	make clean
-	make exec; ./exe
+	make exec; $(EXECUTABLE)
 	make lib
 
 clean:
-	rm -f $(OBJ_DIRECTORY)/*.o $(LIB_DIRECTORY)/*.mod $(LIB_DIRECTORY)/*.a
+	rm -f $(OBJS) $(LIB) $(LIB_DIRECTORY)/*.mod
 	rm -f $(EXECUTABLE)
