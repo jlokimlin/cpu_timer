@@ -22,47 +22,40 @@ module type_CpuTimer
     !---------------------------------------------------------------------------------
     ! Dictionary: global variables confined to the module
     !---------------------------------------------------------------------------------
-    integer (ip), parameter  :: REQUEST_TIME_IN_SECONDS = 0_ip
-    integer (ip), parameter  :: REQUEST_TIME_IN_MINUTES = 1_ip
-    integer (ip), parameter  :: REQUEST_TIME_IN_HOURS   = 2_ip
+    integer (ip), parameter :: REQUEST_TIME_IN_SECONDS = 0_ip
+    integer (ip), parameter :: REQUEST_TIME_IN_MINUTES = 1_ip
+    integer (ip), parameter :: REQUEST_TIME_IN_HOURS   = 2_ip
     !---------------------------------------------------------------------------------
 
     ! Declare derived data type
     type, public :: CpuTimer
-
         !---------------------------------------------------------------------------------
         ! Class variables
         !---------------------------------------------------------------------------------
-        logical,      private   :: initialized     = .false.
-        logical,      private   :: timer_started   = .false.
-        logical,      private   :: timer_stopped   = .false.
-        real (wp),    private   :: cpu_start_time  = 0.0_wp
-        real (wp),    private   :: cpu_finish_time = 0.0_wp
-        integer (ip), private   :: initial_ticks   = 0_ip
-        integer (ip), private   :: final_ticks     = 0_ip  ! final value of the clock tick counter
-        integer (ip), private   :: count_max       = 0_ip  ! maximum value of the clock counter
-        integer (ip), private   :: count_rate      = 0_ip  ! number of clock ticks per second
-        integer (ip), private   :: num_ticks       = 0_ip  ! number of clock ticks of the code
+        logical,      private :: initialized     = .false.
+        logical,      private :: timer_started   = .false.
+        logical,      private :: timer_stopped   = .false.
+        real (wp),    private :: cpu_start_time  = 0.0_wp
+        real (wp),    private :: cpu_finish_time = 0.0_wp
+        integer (ip), private :: initial_ticks   = 0_ip
+        integer (ip), private :: final_ticks     = 0_ip  ! final value of the clock tick counter
+        integer (ip), private :: count_max       = 0_ip  ! maximum value of the clock counter
+        integer (ip), private :: count_rate      = 0_ip  ! number of clock ticks per second
+        integer (ip), private :: num_ticks       = 0_ip  ! number of clock ticks of the code
         !---------------------------------------------------------------------------------
-
     contains
-
         !---------------------------------------------------------------------------------
         ! Class methods
         !---------------------------------------------------------------------------------
-        procedure, public          :: start => start_cpu_timer
-        procedure, public          :: stop  => stop_cpu_timer
-        procedure, public          :: get_total_cpu_time
-        procedure, public          :: get_elapsed_time
-        procedure, public, nopass  :: print_time_stamp
-        procedure, private         :: create  => initialize_cpu_timer
-        procedure, private         :: destroy => destruct_cpu_timer
+        procedure, public         :: start => start_cpu_timer
+        procedure, public         :: stop  => stop_cpu_timer
+        procedure, public         :: get_total_cpu_time
+        procedure, public         :: get_elapsed_time
+        procedure, public, nopass :: print_time_stamp
+        procedure, private        :: create  => initialize_cpu_timer
+        procedure, private        :: destroy => destruct_cpu_timer
+        final                     :: finalize_cpu_timer
         !---------------------------------------------------------------------------------
-        ! Finalizer
-        !---------------------------------------------------------------------------------
-        final                      :: finalize_cpu_timer
-        !---------------------------------------------------------------------------------
-
     end type CpuTimer
 
 contains
@@ -84,7 +77,7 @@ contains
         call cpu_time( this%cpu_start_time )
 
         ! Set initial ticks
-        call system_clock( count = this%initial_ticks )
+        call system_clock( count=this%initial_ticks )
 
         ! Set timer status
         this%timer_started = .true.
@@ -122,27 +115,25 @@ contains
         !--------------------------------------------------------------------------------
         ! Dictionary: calling arguments
         !--------------------------------------------------------------------------------
-        class (CpuTimer),    intent (in out)        :: this
-        integer (ip),        intent (in), optional :: units
-        real (wp)                                  :: return_value
+        class (CpuTimer), intent (in out)       :: this
+        integer (ip),     intent (in), optional :: units
+        real (wp)                               :: return_value
         !--------------------------------------------------------------------------------
 
         !--------------------------------------------------------------------------------
         ! Return zero if the timer was never started
         !--------------------------------------------------------------------------------
 
-        if ( .not.this%timer_started )     then
-
+        if ( .not.this%timer_started ) then
             return_value = 0.0_wp
             return
-
         end if
 
         !--------------------------------------------------------------------------------
         ! If the timer was not stopped, then return the current time elapsed
         !--------------------------------------------------------------------------------
 
-        if ( .not.this%timer_stopped )     then
+        if ( .not.this%timer_stopped ) then
 
             call this%stop()
 
@@ -187,16 +178,16 @@ contains
         !--------------------------------------------------------------------------------
         ! Dictionary: calling arguments
         !--------------------------------------------------------------------------------
-        class (CpuTimer), intent (in out)         :: this
-        integer (ip),     intent (in), optional   :: units
-        real (wp)                                 :: return_value
+        class (CpuTimer), intent (in out)       :: this
+        integer (ip),     intent (in), optional :: units
+        real (wp)                               :: return_value
         !--------------------------------------------------------------------------------
 
         !--------------------------------------------------------------------------------
         ! Return zero if the timer was never started
         !--------------------------------------------------------------------------------
 
-        if ( .not.this%timer_started )     then
+        if ( .not.this%timer_started ) then
             return_value = 0.0_wp
             return
         end if
@@ -205,7 +196,7 @@ contains
         ! If the timer was not stopped, then return the current time elapsed
         !--------------------------------------------------------------------------------
 
-        if ( .not.this%timer_stopped )     then
+        if ( .not.this%timer_stopped ) then
 
             call this%stop()
 
@@ -228,7 +219,7 @@ contains
                 num = num + count_max
             end if
 
-            return_value = real( num, wp) / count_rate
+            return_value = real( num, kind=wp) / count_rate
 
         end associate
 
@@ -283,18 +274,36 @@ contains
         !--------------------------------------------------------------------------------
         ! Dictionary: local variables
         !--------------------------------------------------------------------------------
-        integer (ip)                  :: values(8)
-        character (len=10)            :: time
-        character (len=5)             :: zone
-        character (len=8)             :: am_or_pm
-        character (len=8)             :: date
-        character (len=9), parameter  :: list_of_months(*) = [ &
+        integer (ip)                   :: values(8)
+        integer (ip)                   :: unit
+        character (len=10)             :: time
+        character (len=5)              :: zone
+        character (len=8)              :: am_or_pm
+        character (len=8)              :: date
+        character (len=:), allocatable :: list_of_months(:)
+        character (len=:), allocatable :: time_format
+        !--------------------------------------------------------------------------------
+
+        !--------------------------------------------------------------------------------
+        ! Set months
+        !--------------------------------------------------------------------------------
+
+        allocate( &
+            list_of_months(12), &
+            source = [ &
             'January  ', 'February ', 'March    ', 'April    ', &
             'May      ', 'June     ', 'July     ', 'August   ', &
-            'September', 'October  ', 'November ', 'December ' ]
-        character (len=*), parameter  :: time_format = &
-            '( A, 1X, I2, 1X, I4, 2X, I2, A1, I2.2, A1, I2.2, A1, I3.3, 1X, A)'
+            'September', 'October  ', 'November ', 'December ' ] &
+            )
+
         !--------------------------------------------------------------------------------
+        ! Set time format
+        !--------------------------------------------------------------------------------
+
+        allocate( &
+            time_format, &
+            source = '( A, 1X, I2, 1X, I4, 2X, I2, A1, I2.2, A1, I2.2, A1, I3.3, 1X, A)' &
+            )
 
         !--------------------------------------------------------------------------------
         ! Get the corresponding date and time information from the real-time system clock
@@ -338,34 +347,34 @@ contains
             end if
 
             !--------------------------------------------------------------------------------
-            ! Return time stamp
+            ! Set write unit
             !--------------------------------------------------------------------------------
 
             if ( present( file_unit )) then
-
-                write ( file_unit, fmt =  time_format ) &
-                    trim( LIST_OF_MONTHS( month ) ), &
-                    day, year, hour, ':', &
-                    minute, ':', second, '.', &
-                    millisecond, trim( am_or_pm )
-
+                unit = file_unit
             else
-
-                write ( stdout, fmt = time_format ) &
-                    trim( LIST_OF_MONTHS( month ) ), &
-                    day, year, hour, ':', &
-                    minute, ':', second, '.', &
-                    millisecond, trim( am_or_pm )
-
+                unit = stdout
             end if
+
+            !--------------------------------------------------------------------------------
+            ! Return time stamp
+            !--------------------------------------------------------------------------------
+
+            write ( unit, fmt = time_format ) &
+                trim( LIST_OF_MONTHS( month ) ), &
+                day, year, hour, ':', &
+                minute, ':', second, '.', &
+                millisecond, trim( am_or_pm )
 
         end associate
 
+        !--------------------------------------------------------------------------------
+        ! Free memory
+        !--------------------------------------------------------------------------------
+
+        deallocate( list_of_months, time_format )
+
     end subroutine print_time_stamp
-    !
-    !*****************************************************************************************
-    !
-    ! Private methods
     !
     !*****************************************************************************************
     !
@@ -387,12 +396,11 @@ contains
 
         end if
 
-
         !--------------------------------------------------------------------------------
         ! Initialize counters
         !--------------------------------------------------------------------------------
 
-        call system_clock( count_rate = this%count_rate,  count_max  = this%count_max )
+        call system_clock( count_rate=this%count_rate,  count_max=this%count_max )
 
     end subroutine initialize_cpu_timer
     !
@@ -410,32 +418,32 @@ contains
         ! Check status
         !--------------------------------------------------------------------------------
 
-        if ( .not. this%initialized ) return
+        if ( .not.this%initialized ) return
 
         !---------------------------------------------------------------------------------
         ! Reset booleans
         !---------------------------------------------------------------------------------
 
-        this%initialized     = .false.
-        this%timer_started   = .false.
-        this%timer_stopped   = .false.
+        this%initialized = .false.
+        this%timer_started = .false.
+        this%timer_stopped = .false.
 
         !---------------------------------------------------------------------------------
         ! Reset floats
         !---------------------------------------------------------------------------------
 
-        this%cpu_start_time  = 0.0_wp
+        this%cpu_start_time = 0.0_wp
         this%cpu_finish_time = 0.0_wp
 
         !---------------------------------------------------------------------------------
         ! Reset integers
         !---------------------------------------------------------------------------------
 
-        this%initial_ticks   = 0_ip
-        this%final_ticks     = 0_ip
-        this%count_max       = 0_ip
-        this%count_rate      = 0_ip
-        this%num_ticks       = 0_ip
+        this%initial_ticks = 0_ip
+        this%final_ticks = 0_ip
+        this%count_max = 0_ip
+        this%count_rate = 0_ip
+        this%num_ticks = 0_ip
 
     end subroutine destruct_cpu_timer
     !
