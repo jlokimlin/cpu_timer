@@ -4,7 +4,7 @@ include ../make.inc
 MODULE_PATH = $(LIB_DIRECTORY)
 
 LINKS = \
--L$(LIB_DIRECTORY) -lcpu_timer \
+-L$(LIB_DIRECTORY) -l$(LIB_NAME) \
 -I$(MODULE_PATH)
 
 EXECUTABLE = ./test.exe
@@ -22,5 +22,4 @@ run:
 	make exec; $(EXECUTABLE)
 	 
 clean:
-	rm -f $(OBJS)
-	rm -f $(EXECUTABLE)
+	rm -f $(OBJS) $(EXECUTABLE)

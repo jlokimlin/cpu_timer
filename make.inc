@@ -1,30 +1,24 @@
 
-LIB = ../lib/libcpu_timer.a
+LIB_NAME = cpu_timer
+
+LIB = ../lib/lib$(LIB_NAME).a
 
 AR = /usr/bin/ar
 
 MAKE = /usr/bin/make
-
-# Set directories
 
 #EXTERNAL_LIBRARY_PATH = /usr/local/lib
 EXTERNAL_LIBRARY_PATH = /usr/local/lib64
 
 BIN_PATH = /usr/local/bin
 
-SRC_DIRECTORY = ./
-
-SRC= $(wildcard $(SRC_DIRECTORY)/*.f90)
-
-OBJ := $(patsubst %.f90, %.o, $(wildcard *.f90))
-
 OBJ_DIRECTORY = ../objs
 
 LIB_DIRECTORY = ../lib
 
-OBJS = $(addprefix $(OBJ_DIRECTORY)/, $(OBJ))
+OBJ := $(patsubst %.f90, %.o, $(wildcard *.f90))
 
-# Set compiler options
+OBJS = $(addprefix $(OBJ_DIRECTORY)/, $(OBJ))
 
 FC = gfortran
 
@@ -41,4 +35,3 @@ ERROR_WARNING_OPTIONS = \
 
 CODE_GENERATION_OPTIONS = \
 -fcheck=all
-

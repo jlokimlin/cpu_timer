@@ -22,8 +22,8 @@ exec: $(OBJ)
 	$(FC) $(FFLAGS) -o $(EXECUTABLE) $(OBJS) $(LINKS)
 
 lib: 
-	ar rc libcpu_timer.a $(OBJ_DIRECTORY)/*.o
-	mv libcpu_timer.a $(LIB_DIRECTORY)
+	$(AR) rc lib$(LIB_NAME).a $(OBJS)
+	mv lib$(LIB_NAME).a $(LIB_DIRECTORY)
 
 all:
 	make clean
