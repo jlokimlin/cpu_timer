@@ -18,8 +18,8 @@ exec: $(OBJ)
 	$(FC) $(FFLAGS) -o $(EXECUTABLE) $(OBJS) $(LINKS)
 
 run:
-	make clean
-	make exec; $(EXECUTABLE)
+	$(MAKE) clean
+	$(MAKE) exec; $(EXECUTABLE)
 	 
 clean:
 	rm -f $(OBJS) $(EXECUTABLE)

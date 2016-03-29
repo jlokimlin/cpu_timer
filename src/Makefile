@@ -12,6 +12,12 @@ type_CpuTimer.f90
 	$(FC) $(FFLAGS) -c type_CpuTimer.f90 $(LINKS) \
 	 -o $(OBJ_DIRECTORY)/$@ -J$(LIB_DIRECTORY)
 
+cpu_timer_library.o: \
+type_CpuTimer.o \
+cpu_timer_library.f90
+	$(FC) $(FFLAGS) -c cpu_timer_library.f90 $(LINKS) \
+	 -o $(OBJ_DIRECTORY)/$@ -J$(LIB_DIRECTORY)
+
 main.o: \
 type_CpuTimer.o \
 main.f90
@@ -26,9 +32,9 @@ lib:
 	mv lib$(LIB_NAME).a $(LIB_DIRECTORY)
 
 all:
-	make clean
-	make exec; $(EXECUTABLE)
-	make lib
+	$(MAKE) clean
+	$(MAKE) exec; $(EXECUTABLE)
+	$(MAKE) lib
 
 clean:
 	rm -f $(OBJS) $(LIB) $(LIB_DIRECTORY)/*.mod

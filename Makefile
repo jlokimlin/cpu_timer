@@ -12,8 +12,8 @@ testlib:
 	( cd ./test; $(MAKE) run )
 
 install:
-	cp ./lib/libcpu_timer.a $(EXTERNAL_LIBRARY_PATH)
-	cp -r ../cpu_timer $(BIN_PATH)
+	cp ./lib/lib$(LIB_NAME).a $(EXTERNAL_LIBRARY_PATH)
+	cp -r ../$(LIB_NAME) $(BIN_PATH)
 
 clean: 
 	( cd ./src; $(MAKE) clean; cd ../test; $(MAKE) clean )

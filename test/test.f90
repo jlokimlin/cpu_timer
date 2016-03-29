@@ -7,30 +7,28 @@ program test
         compiler_version, &
         compiler_options
 
-    use type_CpuTimer, only: &
+    use cpu_timer_library, only: &
         CpuTimer
 
     ! Explicit typing only
     implicit none
     
     call test_all()
+
     
 contains
-    !
-    !*****************************************************************************************
-    !
+
+
     subroutine test_all()
-        !---------------------------------------------------------------------------------
+        !-----------------------------------------------------------------------
         ! Dictionary: local variables
-        !---------------------------------------------------------------------------------
+        !-----------------------------------------------------------------------
         class (CpuTimer), allocatable :: timer
-        !---------------------------------------------------------------------------------
+        !-----------------------------------------------------------------------
 
         ! Allocate memory
         allocate( CpuTimer :: timer )
 
-        write( stdout, '(A)' ) ''
-        write( stdout, '(A)' ) '*********************************************'
         write( stdout, '(A)' ) ''
         write( stdout, '(A)' ) '  Demonstrate the usage of TYPE(CpuTimer).'
         write( stdout, '(A)' ) ''
@@ -65,21 +63,21 @@ contains
         deallocate( timer )
 
     end subroutine test_all
-    !
-    !*****************************************************************************************
-    !
+
+
+
     subroutine time_random_number_routine()
         !
-        !< Purpose:
+        !  Purpose:
         !
         !  Times the intrinsic RANDOM_NUMBER routine.
         !
         !
-        !< Licensing:
+        !  Licensing:
         !
         !    This code is distributed under the GNU LGPL license.
         !
-        !---------------------------------------------------------------------------------
+        !-----------------------------------------------------------------------
         !
         ! Record of revisions:
         !
@@ -88,9 +86,9 @@ contains
         !   05/20/09       John Burkardt          Original procedural code
         !   12/20/15       Jon Lo Kim Lin         Object-oriented implementation
         !
-        !---------------------------------------------------------------------------------
+        !-----------------------------------------------------------------------
         ! Dictionary: local variables
-        !---------------------------------------------------------------------------------
+        !-----------------------------------------------------------------------
         type(CpuTimer)         :: timer
         integer(ip)            :: n_log, rep   !! Counters
         integer(ip), parameter :: N_LOG_MIN = 0
@@ -98,10 +96,13 @@ contains
         integer(ip), parameter :: N_MIN = 2**N_LOG_MIN
         integer(ip), parameter :: N_MAX = 2**N_LOG_MAX
         integer(ip), parameter :: REP_NUM = 5
-        real(wp)               :: delta( N_LOG_MIN:N_LOG_MAX, REP_NUM + 3)
-        real(wp)               :: x( N_MAX )
-        !---------------------------------------------------------------------------------
+        real(wp)               :: delta(N_LOG_MIN:N_LOG_MAX, REP_NUM + 3)
+        real(wp)               :: x(N_MAX)
+        !-----------------------------------------------------------------------
 
+        !
+        !==> Print program description
+        !
         write( stdout, '(A)' )     ''
         write( stdout, '(A)' )     '*********************************************'
         write( stdout, '(A)' )     ''
@@ -115,28 +116,35 @@ contains
         write( stdout, '(A, I11)' ) '  Data vectors will be of maximum size    ', N_MAX
         write( stdout, '(A, I11)' ) '  Number of repetitions of the operation: ', REP_NUM
 
+        !
+        !==> Perform calculation
+        !
         do n_log = N_LOG_MIN, N_LOG_MAX
             do rep = 1, REP_NUM
-                associate( n => 2**( n_log ) )
+                associate( n => 2**(n_log) )
 
                     ! start timer
                     call timer%start()
 
-                    call random_number( harvest = x )
+                    call random_number(harvest=x)
 
                     ! stop timer
                     call timer%stop()
 
                     ! Set CPU time
-                    delta( n_log, rep ) = timer%get_total_cpu_time()
+                    delta(n_log, rep) = timer%get_total_cpu_time()
 
                 end associate
             end do
-            delta( n_log, REP_NUM + 1) = minval( delta( n_log,1:REP_NUM) )
-            delta( n_log, REP_NUM + 2) = sum( delta( n_log,1:REP_NUM) ) /  REP_NUM
-            delta( n_log, REP_NUM + 3) = maxval( delta( n_log,1:REP_NUM) )
+            delta(n_log, REP_NUM + 1) = minval( delta(n_log,1:REP_NUM) )
+            delta(n_log, REP_NUM + 2) = sum( delta(n_log,1:REP_NUM) ) /  REP_NUM
+            delta(n_log, REP_NUM + 3) = maxval( delta(n_log,1:REP_NUM) )
         end do
 
+
+        !
+        !==> Print results
+        !
         write( stdout, '(A)' ) ''
         write( stdout, '(A)' ) '  Timing results:'
         write( stdout, '(A)' ) ''
@@ -153,28 +161,27 @@ contains
         write( stdout, '(A)' ) ''
 
         do n_log = N_LOG_MIN, N_LOG_MAX
-            associate( n => 2**( n_log ) )
+            associate( n => 2**(n_log) )
                 write( stdout, '(I11, 8(1PE15.5))' ) &
-                    n, delta( n_log,:)
+                    n, delta(n_log,:)
             end associate
         end do
 
     end subroutine time_random_number_routine
-    !
-    !*****************************************************************************************
-    !
+
+
     subroutine time_vectorized_exp_routine()
         !
-        !< Purpose:
+        !  Purpose:
         !
         !  Times the vectorized EXP routine.
         !
         !
-        !< Licensing:
+        !  Licensing:
         !
         !    This code is distributed under the GNU LGPL license.
         !
-        !---------------------------------------------------------------------------------
+        !-----------------------------------------------------------------------
         !
         ! Record of revisions:
         !
@@ -183,9 +190,9 @@ contains
         !   02/06/07       John Burkardt          Original procedural code
         !   12/20/15       Jon Lo Kim Lin         Object-oriented implementation
         !
-        !--------------------------------------------------------------------------------
+        !----------------------------------------------------------------------
         ! Dictionary: local variables
-        !--------------------------------------------------------------------------------
+        !----------------------------------------------------------------------
         type(CpuTimer)          :: timer
         integer(ip)             :: func, i_rep, n_log !! Counters
         integer(ip), parameter  :: N_LOG_MIN = 12
@@ -194,11 +201,14 @@ contains
         integer(ip), parameter  :: N_MAX = 2**N_LOG_MAX
         integer(ip), parameter  :: N_REP = 5
         real(wp),    parameter  :: PI = acos( -1.0_wp )
-        real(wp)                :: delta( N_LOG_MAX, N_REP )
-        real(wp)                :: x( N_MAX )
-        real(wp)                :: y( N_MAX )
-        !--------------------------------------------------------------------------------
+        real(wp)                :: delta(N_LOG_MAX, N_REP)
+        real(wp)                :: x(N_MAX)
+        real(wp)                :: y(N_MAX)
+        !----------------------------------------------------------------------
 
+        !
+        !==> Print program description
+        !
         write( stdout, '(A)' ) ''
         write( stdout, '(A)' ) '*********************************************'
         write( stdout, '(A)' ) ''
@@ -213,16 +223,21 @@ contains
         write( stdout, '(A, I11)' ) '  Data vectors will be of maximum size    ', N_MAX
         write( stdout, '(A, I11)' ) '  Number of repetitions of the operation: ', N_REP
 
+        !
+        !==> Perform optimized calculation
+        !
         do func = 1, 4
             do i_rep = 1, N_REP
                 do n_log = N_LOG_MIN, N_LOG_MAX
-                    associate( n => 2**( n_log ) )
+                    associate( n => 2**(n_log) )
 
-                        call random_number( harvest = x )
+                        ! Get random number
+                        call random_number(harvest=x)
 
                         ! start timer
                         call timer%start()
 
+                        ! Evaluate functions
                         select case(func)
                             case(1)! First function
                                 y = x
@@ -241,12 +256,12 @@ contains
                     call timer%stop()
 
                     ! Set CPU time
-                    delta( n_log, i_rep ) = timer%get_total_cpu_time()
-
+                    delta(n_log, i_rep) = timer%get_total_cpu_time()
                 end do
-
             end do
-
+            !
+            !==> Print optimized results
+            !
             write( stdout, '(A)' ) ''
             write( stdout, '(A)' ) '  Timing results:'
             write( stdout, '(A)' ) ''
@@ -260,28 +275,27 @@ contains
             write( stdout, '(A)' ) ''
 
             do n_log = N_LOG_MIN, N_LOG_MAX
-                associate( n => 2**( n_log ) )
-                    write( stdout, '(I11, 5(1PE15.5))' ) n, delta( n_log,:)
+                associate( n => 2**(n_log) )
+                    write( stdout, '(I11, 5(1PE15.5))' ) n, delta(n_log,:)
                 end associate
             end do
         end do
 
     end subroutine time_vectorized_exp_routine
-    !
-    !*****************************************************************************************
-    !
+
+
     subroutine time_unvectorized_exp_routine()
         !
-        !< Purpose:
+        !  Purpose:
         !
         !  Times the unvectorized EXP routine.
         !
         !
-        !< Licensing:
+        !  Licensing:
         !
         !    This code is distributed under the GNU LGPL license.
         !
-        !---------------------------------------------------------------------------------
+        !-----------------------------------------------------------------------
         !
         ! Record of revisions:
         !
@@ -290,9 +304,9 @@ contains
         !   02/06/07       John Burkardt          Original procedural code
         !   12/20/15       Jon Lo Kim Lin         Object-oriented implementation
         !
-        !--------------------------------------------------------------------------------
+        !----------------------------------------------------------------------
         ! Dictionary: local variables
-        !--------------------------------------------------------------------------------
+        !----------------------------------------------------------------------
         type(CpuTimer)          :: timer
         integer(ip)             :: func, i, i_rep, n_log !! Counters
         integer(ip), parameter  :: N_LOG_MIN = 12
@@ -301,11 +315,14 @@ contains
         integer(ip), parameter  :: N_MAX = 2**N_LOG_MAX
         integer(ip), parameter  :: N_REP = 5
         real(wp),    parameter  :: PI = acos( -1.0_wp )
-        real(wp)                :: delta( N_LOG_MAX, N_REP )
+        real(wp)                :: delta(N_LOG_MAX, N_REP)
         real(wp)                :: x(N_MAX)
         real(wp)                :: y(N_MAX)
-        !--------------------------------------------------------------------------------
+        !----------------------------------------------------------------------
 
+        !
+        !==> Print program description
+        !
         write( stdout, '(A)' ) ''
         write( stdout, '(A)' ) '*********************************************'
         write( stdout, '(A)' ) ''
@@ -322,46 +339,59 @@ contains
         write( stdout, '(A, I11)' ) '  Data vectors will be of maximum size    ',    N_MAX
         write( stdout, '(A, I11)' ) '  Number of repetitions of the operation: ', N_REP
 
+        !
+        !==> Perform naive calculation
+        !
         loop_over_functions: do func = 1, 4
             do i_rep = 1, N_REP
                 do n_log = N_LOG_MIN, N_LOG_MAX
-                    associate( n => 2**( n_log ))
+                    associate( n => 2**(n_log))
 
-                        call random_number( harvest = x(1:n) )
+                        ! Get random number
+                        call random_number( harvest=x(1:n) )
 
                         ! start timer
                         call timer%start()
 
-                        select case(func)
-                            case(1) ! First function
-                                do i = 1, n
-                                    y(i) = x(i)
-                                end do
-                            case(2)! Second function
-                                do i = 1, n
-                                    y(i) = PI * x(i)
-                                end do
-                            case(3)! Third function
-                                do i = 1, n
-                                    y(i) = sqrt( x(i) )
-                                end do
-                            case(4) ! Fourth function
-                                do i = 1, n
-                                    y(i) = exp( x(i) )
-                                end do
-                            case default
-                                exit
-                        end select
+                        !
+                        !==> Evaluate functions
+                        !
+                        if (func == 1) then
+                            ! First function
+                            do i = 1, n
+                                y(i) = x(i)
+                            end do
+                        else if (func == 2) then
+                            ! Second function
+                            do i = 1, n
+                                y(i) = PI * x(i)
+                            end do
+                        else if (func == 3) then
+                            ! Third function
+                            do i = 1, n
+                                y(i) = sqrt( x(i) )
+                            end do
+                        else if (func == 4) then
+                            ! Fourth function
+                            do i = 1, n
+                                y(i) = exp( x(i) )
+                            end do
+                        else
+                            exit
+                        end if
                     end associate
 
                     ! stop timer
                     call timer%stop()
 
                     ! Set CPU time
-                    delta( n_log, i_rep ) = timer%get_total_cpu_time()
+                    delta(n_log, i_rep) = timer%get_total_cpu_time()
                 end do
             end do
 
+            !
+            !==> Print naive results
+            !
             write( stdout, '(A)' ) ''
             write( stdout, '(A)' ) '*********************************************'
             write( stdout, '(A)' ) ''
@@ -377,29 +407,28 @@ contains
             write( stdout, '(A)' ) ''
 
             do n_log = N_LOG_MIN, N_LOG_MAX
-                associate( n => 2**( n_log ) )
-                    write( stdout, '(I11, 5(1PE15.5))' ) n, delta( n_log,:)
+                associate( n => 2**(n_log) )
+                    write( stdout, '(I11, 5(1PE15.5))' ) n, delta(n_log,:)
                 end associate
             end do
-
         end do loop_over_functions
 
     end subroutine time_unvectorized_exp_routine
-    !
-    !*****************************************************************************************
-    !
+
+
+
     subroutine time_2d_nearest_neighbor_problem()
         !
-        !< Purpose:
+        !  Purpose:
         !
         !  Times the 2D nearest neighbor problem.
         !
         !
-        !< Licensing:
+        !  Licensing:
         !
         !    This code is distributed under the GNU LGPL license.
         !
-        !---------------------------------------------------------------------------------
+        !-----------------------------------------------------------------------
         !
         ! Record of revisions:
         !
@@ -408,9 +437,9 @@ contains
         !   02/06/07       John Burkardt          Original procedural code
         !   12/20/15       Jon Lo Kim Lin         Object-oriented implementation
         !
-        !--------------------------------------------------------------------------------
+        !----------------------------------------------------------------------
         ! Dictionary: local variables
-        !--------------------------------------------------------------------------------
+        !----------------------------------------------------------------------
         type(CpuTimer)         :: timer
         integer(ip)            :: i, i_rep, n_log !! Counters
         integer(ip)            :: i_min
@@ -419,12 +448,15 @@ contains
         integer(ip), parameter :: N_MIN = 2**N_LOG_MIN
         integer(ip), parameter :: N_MAX = 2**N_LOG_MAX
         integer(ip), parameter :: N_REP = 5
-        real(wp)               :: delta( N_LOG_MAX, N_REP )
-        real(wp)               :: x( 2, N_MAX )
-        real(wp)               :: y( 2 )
+        real(wp)               :: delta(N_LOG_MAX, N_REP)
+        real(wp)               :: x(2, N_MAX)
+        real(wp)               :: y(2)
         real(wp)               :: dist_i, dist_min
-        !--------------------------------------------------------------------------------
+        !----------------------------------------------------------------------
 
+        !
+        !==> Print program description
+        !
         write( stdout, '(A)' ) ''
         write( stdout, '(A)' ) '*********************************************'
         write( stdout, '(A)' ) ''
@@ -443,20 +475,22 @@ contains
         write( stdout, '(A, I11)' ) '  Data vectors will be of maximum size    ', N_MAX
         write( stdout, '(A, I11)' ) '  Number of repetitions of the operation: ', N_REP
 
-        call random_number( harvest = x )
-        call random_number( harvest = y )
-
+        !
+        !==> Perform calculation
+        !
+        call random_number(harvest=x)
+        call random_number(harvest=y)
         do i_rep = 1, N_REP
             do n_log = N_LOG_MIN, N_LOG_MAX
-                associate( n => 2**( n_log ) )
+                associate( n => 2**(n_log) )
 
                     ! start timer
                     call timer%start()
 
-                    dist_min = huge( dist_min )
+                    dist_min = huge(dist_min)
                     i_min = 0
                     do i = 1, n
-                        dist_i = sum(( x(1:2,i) - y(1:2) )**2 )
+                        dist_i = sum(( x(:,i) - y )**2 )
                         if( dist_i < dist_min ) then
                             dist_min = dist_i
                             i_min = i
@@ -467,7 +501,7 @@ contains
                     call timer%stop()
 
                     ! Set CPU time
-                    delta( n_log, i_rep ) = timer%get_total_cpu_time()
+                    delta(n_log, i_rep) = timer%get_total_cpu_time()
 
                 end associate
             end do
@@ -486,27 +520,27 @@ contains
         write( stdout, '(A)' ) ''
 
         do n_log = N_LOG_MIN, N_LOG_MAX
-            associate( n => 2**( n_log ) )
-                write( stdout, '(I11,5(1PE15.5))' ) n, delta( n_log,:)
+            associate( n => 2**(n_log) )
+                write( stdout, '(I11,5(1PE15.5))' ) n, delta(n_log,:)
             end associate
         end do
 
     end subroutine time_2d_nearest_neighbor_problem
-    !
-    !*****************************************************************************************
-    !
+
+
+
     subroutine time_matrix_multiplication_problem()
         !
-        !< Purpose:
+        !  Purpose:
         !
         !  Times the matrix multiplication problem.
         !
         !
-        !< Licensing:
+        !  Licensing:
         !
         !    This code is distributed under the GNU LGPL license.
         !
-        !---------------------------------------------------------------------------------
+        !-----------------------------------------------------------------------
         !
         ! Record of revisions:
         !
@@ -515,11 +549,11 @@ contains
         !   03/05/08       John Burkardt          Original procedural code
         !   12/20/15       Jon Lo Kim Lin         Object-oriented implementation
         !
-        !--------------------------------------------------------------------------------
+        !----------------------------------------------------------------------
         ! Dictionary: local variables
-        !--------------------------------------------------------------------------------
+        !----------------------------------------------------------------------
         type(CpuTimer)            :: timer
-        integer(ip)               :: i, j, k    !! Counters
+        integer(ip)               :: i, j, k !! Counters
         integer(ip)               :: l_log, rep !! Counters
         integer(ip), parameter    :: L_LOG_MIN = 1
         integer(ip), parameter    :: L_LOG_MAX = 5
@@ -529,9 +563,12 @@ contains
         real(wp),    allocatable  :: a(:,:)
         real(wp),    allocatable  :: b(:,:)
         real(wp),    allocatable  :: c(:,:)
-        real(wp)                  :: delta( L_LOG_MIN:L_LOG_MAX, 1:REP_NUM )
-        !--------------------------------------------------------------------------------
+        real(wp)                  :: delta(L_LOG_MIN:L_LOG_MAX, 1:REP_NUM )
+        !----------------------------------------------------------------------
 
+        !
+        !==> Print program description
+        !
         write( stdout, '(A)' ) ''
         write( stdout, '(A)' ) '*********************************************'
         write( stdout, '(A)' ) ''
@@ -552,6 +589,9 @@ contains
         write( stdout, '(A)' ) ''
         write( stdout, '(A)' ) '  Use nested DO loops for matrix multiplication.'
 
+        !
+        !==> Perform naive calculation
+        !
         do rep = 1, REP_NUM
             do l_log = L_LOG_MIN, L_LOG_MAX
                 associate( l => 4**( l_log ) )
@@ -561,8 +601,8 @@ contains
                     allocate( b(l,l) )
                     allocate( c(l,l) )
 
-                    call random_number( harvest = a )
-                    call random_number( harvest = b )
+                    call random_number(harvest=a)
+                    call random_number(harvest=b)
 
                     ! start timer
                     call timer%start()
@@ -580,7 +620,7 @@ contains
                     call timer%stop()
 
                     ! Get CPU time
-                    delta( l_log, rep ) = timer%get_total_cpu_time()
+                    delta(l_log, rep) = timer%get_total_cpu_time()
 
                     ! Release memory
                     deallocate( a )
@@ -591,6 +631,9 @@ contains
             end do
         end do
 
+        !
+        !==> Print naive results
+        !
         write( stdout, '(A)' ) ''
         write( stdout, '(A)' ) '  Timing results using nested DO loops:'
         write( stdout, '(A)' ) ''
@@ -609,6 +652,9 @@ contains
             end associate
         end do
 
+        !
+        !==> Perform optimized calculation
+        !
         write( stdout, '(A)' ) ''
         write( stdout, '(A)' ) '  Use the MATMUL routine for matrix multiplication.'
 
@@ -621,19 +667,19 @@ contains
                     allocate( b(l,l) )
                     allocate( c(l,l) )
 
-                    call random_number( harvest = a )
-                    call random_number( harvest = b )
+                    call random_number(harvest=a)
+                    call random_number(harvest=b)
 
                     ! start timer
                     call timer%start()
 
-                    c = matmul( a, b )
+                    c = matmul(a, b)
 
                     ! stop timer
                     call timer%stop()
 
                     ! Set CPU time
-                    delta( l_log, rep ) = timer%get_total_cpu_time()
+                    delta(l_log, rep) = timer%get_total_cpu_time()
 
                     ! Release memory
                     deallocate( a )
@@ -644,6 +690,9 @@ contains
             end do
         end do
 
+        !
+        !==> Print optimized results
+        !
         write( stdout, '(A)' ) ''
         write( stdout, '(A)' ) '  Timing results using MATMUL:'
         write( stdout, '(A)' ) ''
@@ -663,7 +712,7 @@ contains
         end do
 
     end subroutine time_matrix_multiplication_problem
-    !
-    !*****************************************************************************************
-    !
+
+
+
 end program test

@@ -3,8 +3,7 @@ module type_CpuTimer
     use, intrinsic :: iso_fortran_env, only: &
         wp => REAL64, &
         ip => INT32, &
-        stdout => OUTPUT_UNIT, &
-        stderr => ERROR_UNIT
+        stdout => OUTPUT_UNIT
 
     ! Explicit typing only
     implicit none
@@ -13,19 +12,21 @@ module type_CpuTimer
     private
     public :: CpuTimer
 
-    !---------------------------------------------------------------------------------
+
+    !-----------------------------------------------------------------------
     ! Dictionary: global variables confined to the module
-    !---------------------------------------------------------------------------------
+    !-----------------------------------------------------------------------
     integer (ip), parameter  :: REQUEST_TIME_IN_SECONDS = 0
     integer (ip), parameter  :: REQUEST_TIME_IN_MINUTES = 1
-    integer (ip), parameter  :: REQUEST_TIME_IN_HOURS   = 2
-    !---------------------------------------------------------------------------------
+    integer (ip), parameter  :: REQUEST_TIME_IN_HOURS = 2
+    !-----------------------------------------------------------------------
+
 
     ! Declare derived data type
     type, public :: CpuTimer
-        !---------------------------------------------------------------------------------
+        !-----------------------------------------------------------------------
         ! Class variables
-        !---------------------------------------------------------------------------------
+        !-----------------------------------------------------------------------
         logical,      private :: initialized = .false.
         logical,      private :: timer_started  = .false.
         logical,      private :: timer_stopped = .false.
@@ -36,11 +37,11 @@ module type_CpuTimer
         integer (ip), private :: count_max = 0  ! maximum value of the clock counter
         integer (ip), private :: count_rate = 0  ! number of clock ticks per second
         integer (ip), private :: num_ticks = 0  ! number of clock ticks of the code
-        !---------------------------------------------------------------------------------
+        !-----------------------------------------------------------------------
     contains
-        !---------------------------------------------------------------------------------
+        !-----------------------------------------------------------------------
         ! Class methods
-        !---------------------------------------------------------------------------------
+        !-----------------------------------------------------------------------
         procedure, public         :: start => start_cpu_timer
         procedure, public         :: stop => stop_cpu_timer
         procedure, public         :: get_total_cpu_time
@@ -49,81 +50,80 @@ module type_CpuTimer
         procedure, private        :: create => initialize_cpu_timer
         procedure, private        :: destroy => destruct_cpu_timer
         final                     :: finalize_cpu_timer
-         !---------------------------------------------------------------------------------
+        !----------------------------------------------------------------------
     end type CpuTimer
 
+
 contains
-    !
-    !*****************************************************************************************
-    !
-    subroutine start_cpu_timer( this )
-        !
-        !--------------------------------------------------------------------------------
+
+
+    subroutine start_cpu_timer(this)
+        !----------------------------------------------------------------------
         ! Dictionary: calling arguments
-        !--------------------------------------------------------------------------------
+        !----------------------------------------------------------------------
         class (CpuTimer), intent (in out) :: this
-        !--------------------------------------------------------------------------------
+        !----------------------------------------------------------------------
 
         ! Initialize timer
         call this%create()
 
         ! Set CPU start time
-        call cpu_time( this%cpu_start_time )
+        associate( start => this%cpu_start_time )
+            call cpu_time(start)
+        end associate
 
         ! Set initial ticks
-        call system_clock( count = this%initial_ticks )
+        associate( count => this%initial_ticks )
+            call system_clock(count=count)
+        end associate
 
         ! Set timer status
         this%timer_started = .true.
 
     end subroutine start_cpu_timer
-    !
-    !*****************************************************************************************
-    !
-    subroutine stop_cpu_timer( this )
-        !
-        !--------------------------------------------------------------------------------
+
+
+
+    subroutine stop_cpu_timer(this)
+        !----------------------------------------------------------------------
         ! Dictionary: calling arguments
-        !--------------------------------------------------------------------------------
+        !----------------------------------------------------------------------
         class (CpuTimer), intent (in out) :: this
-        !--------------------------------------------------------------------------------
+        !----------------------------------------------------------------------
 
         ! Check timer flag
-        if ( .not. this%timer_started ) return
+        if (this%timer_started .eqv. .false.) return
 
         ! Set cpu finish time
-        call cpu_time( this%cpu_finish_time )
+        call cpu_time(this%cpu_finish_time )
 
         ! Set final ticks
-        call system_clock( count = this%final_ticks )
+        call system_clock( count=this%final_ticks )
 
         ! Set timer status
         this%timer_stopped = .true.
 
     end subroutine stop_cpu_timer
-    !
-    !*****************************************************************************************
-    !
-    function get_total_cpu_time( this, units ) result( return_value )
-        !
-        !--------------------------------------------------------------------------------
+
+
+
+    function get_total_cpu_time(this, units) result( return_value )
+        !----------------------------------------------------------------------
         ! Dictionary: calling arguments
-        !--------------------------------------------------------------------------------
+        !----------------------------------------------------------------------
         class (CpuTimer),       intent (in out) :: this
         integer (ip), optional, intent (in)     :: units
         real (wp)                               :: return_value
-        !--------------------------------------------------------------------------------
+        !----------------------------------------------------------------------
+
+        ! Initialize return value
+        return_value = 0.0_wp
 
         ! Return zero if the timer was never started
-        if ( .not.this%timer_started ) then
-            return_value = 0.0_wp
-            return
-        end if
+        if ( this%timer_started .eqv. .false. ) return
 
         ! If the timer was not stopped, then return the current time elapsed
-        if ( .not.this%timer_stopped ) then
-            call this%stop()
-        end if
+        if ( this%timer_stopped .eqv. .false. ) call this%stop()
 
         ! Set total time
         associate( &
@@ -134,7 +134,7 @@ contains
         end associate
 
         ! Convert to requested units if desired
-        if ( present(units) ) then
+        if (present(units)) then
             select case (units)
                 case(REQUEST_TIME_IN_SECONDS)
                     return
@@ -143,36 +143,34 @@ contains
                 case(REQUEST_TIME_IN_HOURS)
                     return_value = return_value/ 3600
                 case default
-                    write( stderr, '(A)') 'TYPE(CpuTimer)'
-                    write( stderr, '(A)' ) 'Invalid calling argument for UNITS'
-                    write( stderr, '(A)' ) 'must be either 0, 1, or 2'
+                    error stop 'TYPE(CpuTimer): '&
+                        //' Invalid calling argument in GET_TOTAL_CPU_TIME'&
+                        //' UNITS must be either 0 (seconds), 1 (minutes), or 2 (hours)'
             end select
         end if
 
     end function get_total_cpu_time
-    !
-    !*****************************************************************************************
-    !
-    function get_elapsed_time( this, units ) result ( return_value )
-        !
-        !--------------------------------------------------------------------------------
+
+
+
+
+    function get_elapsed_time(this, units) result (return_value)
+        !----------------------------------------------------------------------
         ! Dictionary: calling arguments
-        !--------------------------------------------------------------------------------
+        !----------------------------------------------------------------------
         class (CpuTimer),       intent (in out) :: this
         integer (ip), optional, intent (in)     :: units
         real (wp)                               :: return_value
-        !--------------------------------------------------------------------------------
+        !----------------------------------------------------------------------
+
+        ! Initialize return value
+        return_value = 0.0_wp
 
         ! Return zero if the timer was never started
-        if ( .not.this%timer_started ) then
-            return_value = 0.0_wp
-            return
-        end if
+        if ( this%timer_started .eqv. .false. ) return
 
         ! If the timer was not stopped, then return the current time elapsed
-        if ( .not.this%timer_stopped ) then
-            call this%stop()
-        end if
+        if ( this%timer_stopped .eqv. .false. ) call this%stop()
 
         ! Set elapsed time in seconds
         associate( &
@@ -186,44 +184,43 @@ contains
             if ( final < initial ) then
                 num = num + count_max
             end if
-            return_value = real( num, kind=wp) / count_rate
+            return_value = real(num, kind=wp) / count_rate
         end associate
 
         ! Convert to requested units if desired
-        if ( present( units ) ) then
-            select case ( units )
-                case( REQUEST_TIME_IN_SECONDS)
+        if ( present(units) ) then
+            select case (units)
+                case (REQUEST_TIME_IN_SECONDS)
                     return
-                case( REQUEST_TIME_IN_MINUTES )
+                case (REQUEST_TIME_IN_MINUTES )
                     return_value = return_value/ 60
-                case( REQUEST_TIME_IN_HOURS )
+                case (REQUEST_TIME_IN_HOURS )
                     return_value = return_value/ 3600
                 case default
-                    write( stderr, '(A)') 'TYPE(CpuTimer)'
-                    write( stderr, '(A)' ) 'Invalid calling argument for UNITS'
-                    write( stderr, '(A)' ) 'must be either 0, 1, or 2'
+                    error stop 'TYPE(CpuTimer): '&
+                        //' Invalid calling argument in GET_ELAPSED_TIME'&
+                        //' UNITS must be either 0 (seconds), 1 (minutes), or 2 (hours)'
             end select
         end if
 
     end function get_elapsed_time
-    !
-    !*****************************************************************************************
-    !
-    subroutine print_time_stamp( file_unit )
+
+
+    subroutine print_time_stamp(file_unit)
         !
-        !< Purpose:
+        ! Purpose:
         !
         !  prints the current YMDHMS date as a time stamp.
         !
-        !< Example:
+        !  Example:
         !
         !  May 31 2001   9:45:54.872 AM
         !
-        !< Licensing:
+        !  Licensing:
         !
         !  This code is distributed under the GNU LGPL license.
         !
-        !---------------------------------------------------------------------------------
+        !-----------------------------------------------------------------------
         !
         ! Record of revisions:
         !
@@ -232,13 +229,14 @@ contains
         !   05/31/01       John Burkardt          Original procedural code
         !   12/20/15       Jon Lo Kim Lin         Object-oriented implementation
         !
-        !--------------------------------------------------------------------------------
+        !----------------------------------------------------------------------
         ! Dictionary: calling arguments
-        !--------------------------------------------------------------------------------
+        !----------------------------------------------------------------------
         integer (ip), intent (in), optional :: file_unit
-        !--------------------------------------------------------------------------------
+        !----------------------------------------------------------------------
         ! Dictionary: local variables
-        !--------------------------------------------------------------------------------
+        !----------------------------------------------------------------------
+        integer (ip)                  :: file_unit_op
         integer (ip)                  :: values(8)
         character (len=10)            :: time
         character (len=5)             :: zone
@@ -250,12 +248,22 @@ contains
             'September', 'October  ', 'November ', 'December ' ]
         character (len=*), parameter  :: time_format = &
             '( A, 1X, I2, 1X, I4, 2X, I2, A1, I2.2, A1, I2.2, A1, I3.3, 1X, A)'
-        !--------------------------------------------------------------------------------
+        !----------------------------------------------------------------------
 
-        ! Get the corresponding date and time information from the real-time system clock
-        call date_and_time( date, time, zone, values )
+        !
+        !==> Address optional argument
+        file_unit_op = stdout
+        if (present(file_unit)) file_unit_op = file_unit
 
-        ! Associate results
+        !
+        !==> Get the corresponding date and time information
+        !    from the real-time system clock
+        !
+        call date_and_time(date=date, time=time, zone=zone, values=values)
+
+        !
+        !==> Associate results
+        !
         associate( &
             year => values(1), &
             month => values(2), &
@@ -288,54 +296,49 @@ contains
             end if
 
             !
-            ! Return time stamp
-            if ( present( file_unit )) then
-                write( file_unit, fmt =  time_format ) &
-                    trim( LIST_OF_MONTHS( month ) ), &
-                    day, year, hour, ':', &
-                    minute, ':', second, '.', &
-                    millisecond, trim( am_or_pm )
-            else
-                write( stdout, fmt = time_format ) &
-                    trim( LIST_OF_MONTHS( month ) ), &
-                    day, year, hour, ':', &
-                    minute, ':', second, '.', &
-                    millisecond, trim( am_or_pm )
-            end if
+            !==> Print time stamp
+            !
+            write( file_unit_op, fmt=time_format ) &
+                trim( LIST_OF_MONTHS( month ) ), &
+                day, year, hour, ':', &
+                minute, ':', second, '.', &
+                millisecond, trim( am_or_pm )
         end associate
 
     end subroutine print_time_stamp
-    !
-    !*****************************************************************************************
-    !
-    subroutine initialize_cpu_timer( this )
-        !
-        !--------------------------------------------------------------------------------
+
+
+    subroutine initialize_cpu_timer(this)
+        !----------------------------------------------------------------------
         ! Dictionary: calling arguments
-        !--------------------------------------------------------------------------------
+        !----------------------------------------------------------------------
         class (CpuTimer), intent (in out) :: this
-        !--------------------------------------------------------------------------------
+        !----------------------------------------------------------------------
 
         ! Ensure that object is usable
         call this%destroy()
 
         ! Initialize counters
-        call system_clock( count_rate=this%count_rate, count_max=this%count_max )
+        associate( &
+            count_rate => this%count_rate, &
+            count_max => this%count_max &
+            )
+            call system_clock(count_rate=count_rate, count_max=count_max)
+        end associate
 
     end subroutine initialize_cpu_timer
-    !
-    !*****************************************************************************************
-    !
-    subroutine destruct_cpu_timer( this )
-        !
-        !--------------------------------------------------------------------------------
-        ! Dictionary: calling arguments
-        !--------------------------------------------------------------------------------
-        class (CpuTimer), intent (in out) :: this
-        !--------------------------------------------------------------------------------
 
-        ! Check status
-        if ( .not.this%initialized ) return
+
+
+    subroutine destruct_cpu_timer(this)
+        !----------------------------------------------------------------------
+        ! Dictionary: calling arguments
+        !----------------------------------------------------------------------
+        class (CpuTimer), intent (in out) :: this
+        !----------------------------------------------------------------------
+
+        ! Check flag
+        if (this%initialized .eqv. .false.) return
 
         ! Reset booleans
         this%initialized = .false.
@@ -354,21 +357,21 @@ contains
         this%num_ticks = 0
 
     end subroutine destruct_cpu_timer
-    !
-    !*****************************************************************************************
-    !
-    subroutine finalize_cpu_timer( this )
+
+
+
+    subroutine finalize_cpu_timer(this)
         !
-        !--------------------------------------------------------------------------------
+        !----------------------------------------------------------------------
         ! Dictionary: calling arguments
-        !--------------------------------------------------------------------------------
+        !----------------------------------------------------------------------
         type (CpuTimer), intent (in out) :: this
-        !--------------------------------------------------------------------------------
+        !----------------------------------------------------------------------
 
         call this%destroy()
 
     end subroutine finalize_cpu_timer
-    !
-    !*****************************************************************************************
-    !
+
+
+
 end module type_CpuTimer
