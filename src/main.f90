@@ -1,6 +1,6 @@
 program main
 
-    use type_CpuTimer, only: &
+    use cpu_timer_library, only: &
         CpuTimer
 
     print '(A)', 'Successful build!'

@@ -67,12 +67,16 @@ contains
         ! Initialize timer
         call this%create()
 
-        ! Set CPU start time
+        !
+        !==> Set CPU start time
+        !
         associate( start => this%cpu_start_time )
             call cpu_time(start)
         end associate
 
-        ! Set initial ticks
+        !
+        !==> Set initial ticks
+        !
         associate( count => this%initial_ticks )
             call system_clock(count=count)
         end associate
@@ -92,13 +96,23 @@ contains
         !----------------------------------------------------------------------
 
         ! Check timer flag
-        if (this%timer_started .eqv. .false.) return
+        if (this%timer_started .eqv. .false.) then
+            return
+        end if
 
-        ! Set cpu finish time
-        call cpu_time(this%cpu_finish_time )
+        !
+        !==> Set cpu finish time
+        !
+        associate( finish => this%cpu_finish_time )
+            call cpu_time(finish)
+        end associate
 
-        ! Set final ticks
-        call system_clock( count=this%final_ticks )
+        !
+        !==> Set final ticks
+        !
+        associate( count => this%final_ticks )
+            call system_clock(count=count)
+        end associate
 
         ! Set timer status
         this%timer_stopped = .true.
@@ -119,13 +133,25 @@ contains
         ! Initialize return value
         return_value = 0.0_wp
 
-        ! Return zero if the timer was never started
-        if ( this%timer_started .eqv. .false. ) return
+        !
+        !==> Return zero if the timer was never started
+        !
+        if (this%timer_started .eqv. .false.) then
+            return
+        end if
 
-        ! If the timer was not stopped, then return the current time elapsed
-        if ( this%timer_stopped .eqv. .false. ) call this%stop()
 
-        ! Set total time
+        !
+        !==> If the timer was not stopped,
+        !    then return the current time elapsed
+        !
+        if (this%timer_stopped .eqv. .false.) then
+            call this%stop()
+        end if
+
+        !
+        !==> Set total cpu time in seconds
+        !
         associate( &
             start => this%cpu_start_time, &
             finish => this%cpu_finish_time &
@@ -133,7 +159,9 @@ contains
             return_value = finish - start
         end associate
 
-        ! Convert to requested units if desired
+        !
+        !==> Convert to requested units if desired
+        !
         if (present(units)) then
             select case (units)
                 case(REQUEST_TIME_IN_SECONDS)
@@ -166,13 +194,24 @@ contains
         ! Initialize return value
         return_value = 0.0_wp
 
-        ! Return zero if the timer was never started
-        if ( this%timer_started .eqv. .false. ) return
+        !
+        !==> Return zero if the timer was never started
+        !
+        if (this%timer_started .eqv. .false.) then
+            return
+        end if
 
-        ! If the timer was not stopped, then return the current time elapsed
-        if ( this%timer_stopped .eqv. .false. ) call this%stop()
+        !
+        !==> If the timer was not stopped,
+        !    then return the current time elapsed
+        !
+        if (this%timer_stopped .eqv. .false.) then
+            call this%stop()
+        end if
 
-        ! Set elapsed time in seconds
+        !
+        !==> Set elapsed time in seconds
+        !
         associate( &
             num => this%num_ticks, &
             final => this%final_ticks, &
@@ -184,11 +223,13 @@ contains
             if ( final < initial ) then
                 num = num + count_max
             end if
-            return_value = real(num, kind=wp) / count_rate
+            return_value = real(num, kind=wp)/count_rate
         end associate
 
-        ! Convert to requested units if desired
-        if ( present(units) ) then
+        !
+        !==> Convert to requested units if desired
+        !
+        if (present(units)) then
             select case (units)
                 case (REQUEST_TIME_IN_SECONDS)
                     return
@@ -204,6 +245,7 @@ contains
         end if
 
     end function get_elapsed_time
+
 
 
     subroutine print_time_stamp(file_unit)
@@ -253,7 +295,9 @@ contains
         !
         !==> Address optional argument
         file_unit_op = stdout
-        if (present(file_unit)) file_unit_op = file_unit
+        if (present(file_unit)) then
+            file_unit_op = file_unit
+        end if
 
         !
         !==> Get the corresponding date and time information
@@ -308,6 +352,7 @@ contains
     end subroutine print_time_stamp
 
 
+
     subroutine initialize_cpu_timer(this)
         !----------------------------------------------------------------------
         ! Dictionary: calling arguments
@@ -338,7 +383,9 @@ contains
         !----------------------------------------------------------------------
 
         ! Check flag
-        if (this%initialized .eqv. .false.) return
+        if (this%initialized .eqv. .false.) then
+            return
+        end if
 
         ! Reset booleans
         this%initialized = .false.

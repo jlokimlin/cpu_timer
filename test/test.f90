@@ -15,8 +15,10 @@ program test
     
     call test_all()
 
+
     
 contains
+
 
 
     subroutine test_all()
@@ -26,7 +28,9 @@ contains
         class (CpuTimer), allocatable :: timer
         !-----------------------------------------------------------------------
 
-        ! Allocate memory
+        !
+        !==> Allocate memory
+        !
         allocate( CpuTimer :: timer )
 
         write( stdout, '(A)' ) ''
@@ -36,30 +40,41 @@ contains
         ! print time stamp
         call timer%print_time_stamp()
 
+        !
+        !==> Time various calculations
+        !
         call time_random_number_routine()
         call time_vectorized_exp_routine()
         call time_unvectorized_exp_routine()
         call time_2d_nearest_neighbor_problem()
         call time_matrix_multiplication_problem()
 
-        !  Terminate
+        !
+        !==> Terminate
+        !
         write( stdout, '(A)' ) ''
         write( stdout, '(A)' ) ' TYPE (CpuTimer) tests.'
         write( stdout, '(A)' ) ''
         write( stdout, '(A)' ) ' Normal end of execution.'
         write( stdout, '(A)' ) ''
 
-        ! Print time stamp
+        !
+        !==> Print time stamp
+        !
         call timer%print_time_stamp()
 
-        ! Print compiler info
+        !
+        !==> Print compiler info
+        !
         write( stdout, '(A)' ) ''
         write( stdout, '(4A)' ) 'This file was compiled by ', &
             compiler_version(), ' using the options ', &
             compiler_options()
         write( stdout, '(A)' ) ''
 
-        ! Release memory
+        !
+        !==> Release memory
+        !
         deallocate( timer )
 
     end subroutine test_all
@@ -89,7 +104,7 @@ contains
         !-----------------------------------------------------------------------
         ! Dictionary: local variables
         !-----------------------------------------------------------------------
-        type(CpuTimer)         :: timer
+        type (CpuTimer)        :: timer
         integer(ip)            :: n_log, rep   !! Counters
         integer(ip), parameter :: N_LOG_MIN = 0
         integer(ip), parameter :: N_LOG_MAX = 20
@@ -193,14 +208,14 @@ contains
         !----------------------------------------------------------------------
         ! Dictionary: local variables
         !----------------------------------------------------------------------
-        type(CpuTimer)          :: timer
+        type (CpuTimer)         :: timer
         integer(ip)             :: func, i_rep, n_log !! Counters
         integer(ip), parameter  :: N_LOG_MIN = 12
         integer(ip), parameter  :: N_LOG_MAX = 22
         integer(ip), parameter  :: N_MIN = 2**N_LOG_MIN
         integer(ip), parameter  :: N_MAX = 2**N_LOG_MAX
         integer(ip), parameter  :: N_REP = 5
-        real(wp),    parameter  :: PI = acos( -1.0_wp )
+        real(wp),    parameter  :: PI = acos(-1.0_wp)
         real(wp)                :: delta(N_LOG_MAX, N_REP)
         real(wp)                :: x(N_MAX)
         real(wp)                :: y(N_MAX)
@@ -231,7 +246,7 @@ contains
                 do n_log = N_LOG_MIN, N_LOG_MAX
                     associate( n => 2**(n_log) )
 
-                        ! Get random number
+                        ! Generate some random data
                         call random_number(harvest=x)
 
                         ! start timer
@@ -307,14 +322,14 @@ contains
         !----------------------------------------------------------------------
         ! Dictionary: local variables
         !----------------------------------------------------------------------
-        type(CpuTimer)          :: timer
+        type (CpuTimer)         :: timer
         integer(ip)             :: func, i, i_rep, n_log !! Counters
         integer(ip), parameter  :: N_LOG_MIN = 12
         integer(ip), parameter  :: N_LOG_MAX = 22
         integer(ip), parameter  :: N_MIN = 2**N_LOG_MIN
         integer(ip), parameter  :: N_MAX = 2**N_LOG_MAX
         integer(ip), parameter  :: N_REP = 5
-        real(wp),    parameter  :: PI = acos( -1.0_wp )
+        real(wp),    parameter  :: PI = acos(-1.0_wp)
         real(wp)                :: delta(N_LOG_MAX, N_REP)
         real(wp)                :: x(N_MAX)
         real(wp)                :: y(N_MAX)
@@ -331,8 +346,8 @@ contains
         write( stdout, '(A)' ) '    do i = 1, n'
         write( stdout, '(A)' ) '      y(i) = x(i)  '
         write( stdout, '(A)' ) '      y(i) = PI * x(i)  '
-        write( stdout, '(A)' ) '      y(i) = sqrt( x(i) )'
-        write( stdout, '(A)' ) '      y(i) = exp( x(i) )'
+        write( stdout, '(A)' ) '      y(i) = sqrt(x(i))'
+        write( stdout, '(A)' ) '      y(i) = exp(x(i))'
         write( stdout, '(A)' ) '    end do'
         write( stdout, '(A)' ) ''
         write( stdout, '(A, I11)' ) '  Data vectors will be of minimum size    ',    N_MIN
@@ -347,8 +362,8 @@ contains
                 do n_log = N_LOG_MIN, N_LOG_MAX
                     associate( n => 2**(n_log))
 
-                        ! Get random number
-                        call random_number( harvest=x(1:n) )
+                        ! Generate some random data
+                        call random_number(harvest=x(1:n))
 
                         ! start timer
                         call timer%start()
@@ -369,12 +384,12 @@ contains
                         else if (func == 3) then
                             ! Third function
                             do i = 1, n
-                                y(i) = sqrt( x(i) )
+                                y(i) = sqrt(x(i))
                             end do
                         else if (func == 4) then
                             ! Fourth function
                             do i = 1, n
-                                y(i) = exp( x(i) )
+                                y(i) = exp(x(i))
                             end do
                         else
                             exit
@@ -440,7 +455,7 @@ contains
         !----------------------------------------------------------------------
         ! Dictionary: local variables
         !----------------------------------------------------------------------
-        type(CpuTimer)         :: timer
+        type (CpuTimer)        :: timer
         integer(ip)            :: i, i_rep, n_log !! Counters
         integer(ip)            :: i_min
         integer(ip), parameter :: N_LOG_MIN = 10
@@ -478,8 +493,12 @@ contains
         !
         !==> Perform calculation
         !
+
+        ! Generate some random data
         call random_number(harvest=x)
         call random_number(harvest=y)
+
+        ! Solve nearest neighbor problem
         do i_rep = 1, N_REP
             do n_log = N_LOG_MIN, N_LOG_MAX
                 associate( n => 2**(n_log) )
@@ -489,6 +508,7 @@ contains
 
                     dist_min = huge(dist_min)
                     i_min = 0
+
                     do i = 1, n
                         dist_i = sum(( x(:,i) - y )**2 )
                         if( dist_i < dist_min ) then
@@ -552,7 +572,7 @@ contains
         !----------------------------------------------------------------------
         ! Dictionary: local variables
         !----------------------------------------------------------------------
-        type(CpuTimer)            :: timer
+        type (CpuTimer)           :: timer
         integer(ip)               :: i, j, k !! Counters
         integer(ip)               :: l_log, rep !! Counters
         integer(ip), parameter    :: L_LOG_MIN = 1
@@ -660,13 +680,14 @@ contains
 
         do rep = 1, REP_NUM
             do l_log = L_LOG_MIN, L_LOG_MAX
-                associate( l => 4**( l_log ) )
+                associate( l => 4**(l_log) )
 
                     ! Allocate memory
                     allocate( a(l,l) )
                     allocate( b(l,l) )
                     allocate( c(l,l) )
 
+                    ! Generate some random data
                     call random_number(harvest=a)
                     call random_number(harvest=b)
 
