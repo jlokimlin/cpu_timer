@@ -34,7 +34,7 @@ contains
         allocate( CpuTimer :: timer )
 
         write( stdout, '(A)' ) ''
-        write( stdout, '(A)' ) '  Demonstrate the usage of TYPE(CpuTimer).'
+        write( stdout, '(A)' ) '  Demonstrate the usage of type (CpuTimer).'
         write( stdout, '(A)' ) ''
 
         ! print time stamp
@@ -53,7 +53,7 @@ contains
         !==> Terminate
         !
         write( stdout, '(A)' ) ''
-        write( stdout, '(A)' ) ' TYPE (CpuTimer) tests.'
+        write( stdout, '(A)' ) ' type (CpuTimer) tests.'
         write( stdout, '(A)' ) ''
         write( stdout, '(A)' ) ' Normal end of execution.'
         write( stdout, '(A)' ) ''
@@ -66,11 +66,7 @@ contains
         !
         !==> Print compiler info
         !
-        write( stdout, '(A)' ) ''
-        write( stdout, '(4A)' ) 'This file was compiled by ', &
-            compiler_version(), ' using the options ', &
-            compiler_options()
-        write( stdout, '(A)' ) ''
+        call timer%print_compiler_info()
 
         !
         !==> Release memory
@@ -85,7 +81,7 @@ contains
         !
         !  Purpose:
         !
-        !  Times the intrinsic RANDOM_NUMBER routine.
+        !  Times the intrinsic random_number routine.
         !
         !
         !  Licensing:
@@ -121,9 +117,9 @@ contains
         write( stdout, '(A)' )     ''
         write( stdout, '(A)' )     '*********************************************'
         write( stdout, '(A)' )     ''
-        write( stdout, '(A)' )     ' TIME_RANDOM_NUMBER_ROUTINE'
+        write( stdout, '(A)' )     ' time_random_number_routine'
         write( stdout, '(A)' )     ''
-        write( stdout, '(A)' )     ' times the intrinsic RANDOM_NUMBER routine:'
+        write( stdout, '(A)' )     ' times the intrinsic random_number routine:'
         write( stdout, '(A)' )     ''
         write( stdout, '(A)' )     '    call random_number( x(1:n) )'
         write( stdout, '(A)' )     ''
@@ -227,7 +223,7 @@ contains
         write( stdout, '(A)' ) ''
         write( stdout, '(A)' ) '*********************************************'
         write( stdout, '(A)' ) ''
-        write( stdout, '(A)' ) '  TIME_VECTORIZED_EXP_ROUTINE:'
+        write( stdout, '(A)' ) '  time_vectorized_exp_routine:'
         write( stdout, '(A)' ) ''
         write( stdout, '(A)' ) '    y(1:n) = x(1:n)  '
         write( stdout, '(A)' ) '    y(1:n) = PI * x(1:n)  '
@@ -341,7 +337,7 @@ contains
         write( stdout, '(A)' ) ''
         write( stdout, '(A)' ) '*********************************************'
         write( stdout, '(A)' ) ''
-        write( stdout, '(A)' ) ' TIME_UNVECTORIZED_EXP_ROUTINE'
+        write( stdout, '(A)' ) ' time_unvectorized_exp_routine'
         write( stdout, '(A)' ) ''
         write( stdout, '(A)' ) '    do i = 1, n'
         write( stdout, '(A)' ) '      y(i) = x(i)  '
@@ -475,7 +471,7 @@ contains
         write( stdout, '(A)' ) ''
         write( stdout, '(A)' ) '*********************************************'
         write( stdout, '(A)' ) ''
-        write( stdout, '(A)' ) '  TIME_2D_NEAREST_NEIGHBOR_PROBLEM'
+        write( stdout, '(A)' ) '  time_2d_nearest_neighbor_problem'
         write( stdout, '(A)' ) ''
         write( stdout, '(A)' ) '  Given x(2,n) and y(2),'
         write( stdout, '(A)' ) ''
@@ -592,7 +588,7 @@ contains
         write( stdout, '(A)' ) ''
         write( stdout, '(A)' ) '*********************************************'
         write( stdout, '(A)' ) ''
-        write( stdout, '(A)' ) '  TIME_MATRIX_MULTIPLICATION_PROBLEM'
+        write( stdout, '(A)' ) '  time_matrix_multiplication_problem'
         write( stdout, '(A)' ) ''
         write( stdout, '(A)' ) '  Compute C = A * B'
         write( stdout, '(A)' ) ''
@@ -607,7 +603,7 @@ contains
         write( stdout, '(A, I11)' ) '  Number of repetitions of the operation: ', REP_NUM
 
         write( stdout, '(A)' ) ''
-        write( stdout, '(A)' ) '  Use nested DO loops for matrix multiplication.'
+        write( stdout, '(A)' ) '  Use nested do loops for matrix multiplication.'
 
         !
         !==> Perform naive calculation
@@ -655,7 +651,7 @@ contains
         !==> Print naive results
         !
         write( stdout, '(A)' ) ''
-        write( stdout, '(A)' ) '  Timing results using nested DO loops:'
+        write( stdout, '(A)' ) '  Timing results using nested do loops:'
         write( stdout, '(A)' ) ''
         write( stdout, '(6A)' ) &
             '       Size    ',&
@@ -676,7 +672,7 @@ contains
         !==> Perform optimized calculation
         !
         write( stdout, '(A)' ) ''
-        write( stdout, '(A)' ) '  Use the MATMUL routine for matrix multiplication.'
+        write( stdout, '(A)' ) '  Use the matmul routine for matrix multiplication.'
 
         do rep = 1, REP_NUM
             do l_log = L_LOG_MIN, L_LOG_MAX
@@ -715,7 +711,7 @@ contains
         !==> Print optimized results
         !
         write( stdout, '(A)' ) ''
-        write( stdout, '(A)' ) '  Timing results using MATMUL:'
+        write( stdout, '(A)' ) '  Timing results using matmul:'
         write( stdout, '(A)' ) ''
         write( stdout, '(6A)' ) &
             '       Size    ',&

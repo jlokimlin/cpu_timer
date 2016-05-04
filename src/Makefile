@@ -19,7 +19,7 @@ cpu_timer_library.f90
 	 -o $(OBJ_DIRECTORY)/$@ -J$(LIB_DIRECTORY)
 
 main.o: \
-type_CpuTimer.o \
+cpu_timer_library.o \
 main.f90
 	$(FC) $(FFLAGS) -c main.f90 $(LINKS) \
 	-o $(OBJ_DIRECTORY)/$@
