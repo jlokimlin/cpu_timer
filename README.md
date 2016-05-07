@@ -1,6 +1,6 @@
-# **cpu\_timer**
+# **cpu\_timer - A modern Fortran (2008+) library for timing program execution**
 
-This Fortran project implements a class for computing elapsed CPU time. More specifically, you can determine the CPU time consumed by a particular piece of your code, that is:
+An object-oriented library for computing elapsed CPU time. More specifically, you can determine the CPU time consumed by a particular piece of your code, that is:
 
 ```fortran
 
@@ -16,6 +16,16 @@ This Fortran project implements a class for computing elapsed CPU time. More spe
 	
 	print *, 'Elapsed CPU time = ', blah
 ```
+
+
+
+-----------------------------------------------------------------------------
+
+## Contributing
+
+This project is still a work in progress and anyone is free to contribute under the proviso that they abstain from using the dreaded **go to**.
+
+For bug reports or feature requests please open an issue on github.
 
 -----------------------------------------------------------------------------
 
