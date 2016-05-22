@@ -3,6 +3,7 @@ module type_CpuTimer
     use, intrinsic :: iso_fortran_env, only: &
         wp => REAL64, &
         ip => INT32, &
+        long => INT64, &
         stdout => OUTPUT_UNIT, &
         compiler_version, &
         compiler_options
@@ -29,16 +30,16 @@ module type_CpuTimer
         !-----------------------------------------------------------------------
         ! Class variables
         !-----------------------------------------------------------------------
-        logical,      private :: initialized = .false.
-        logical,      private :: timer_started  = .false.
-        logical,      private :: timer_stopped = .false.
-        real (wp),    private :: cpu_start_time = 0.0_wp
-        real (wp),    private :: cpu_finish_time = 0.0_wp
-        integer (ip), private :: initial_ticks = 0
-        integer (ip), private :: final_ticks = 0  ! final value of the clock tick counter
-        integer (ip), private :: count_max = 0  ! maximum value of the clock counter
-        integer (ip), private :: count_rate = 0  ! number of clock ticks per second
-        integer (ip), private :: num_ticks = 0  ! number of clock ticks of the code
+        logical,        private :: initialized = .false.
+        logical,        private :: timer_started  = .false.
+        logical,        private :: timer_stopped = .false.
+        real (wp),      private :: cpu_start_time = 0.0_wp
+        real (wp),      private :: cpu_finish_time = 0.0_wp
+        integer (long), private :: initial_ticks = 0_long
+        integer (long), private :: final_ticks = 0_long  ! final value of the clock tick counter
+        integer (long), private :: count_max = 0_long  ! maximum value of the clock counter
+        integer (long), private :: count_rate = 0_long  ! number of clock ticks per second
+        integer (long), private :: num_ticks = 0_long  ! number of clock ticks of the code
         !-----------------------------------------------------------------------
     contains
         !-----------------------------------------------------------------------
@@ -152,10 +153,7 @@ contains
             !==> If the timer was not stopped,
             !    then return the current time elapsed
             !
-            if (this%timer_stopped .eqv. .false.) then
-                call this%stop()
-            end if
-
+            if (this%timer_stopped .eqv. .false.) call this%stop()
 
             associate( &
                 start => this%cpu_start_time, &

@@ -143,7 +143,7 @@ contains
                     call timer%stop()
 
                     ! Set CPU time
-                    delta(n_log, rep) = timer%get_total_cpu_time()
+                    delta(n_log, rep) = timer%get_elapsed_time()
 
                 end associate
             end do
@@ -267,7 +267,7 @@ contains
                     call timer%stop()
 
                     ! Set CPU time
-                    delta(n_log, i_rep) = timer%get_total_cpu_time()
+                    delta(n_log, i_rep) = timer%get_elapsed_time()
                 end do
             end do
             !
@@ -396,7 +396,7 @@ contains
                     call timer%stop()
 
                     ! Set CPU time
-                    delta(n_log, i_rep) = timer%get_total_cpu_time()
+                    delta(n_log, i_rep) = timer%get_elapsed_time()
                 end do
             end do
 
@@ -517,7 +517,7 @@ contains
                     call timer%stop()
 
                     ! Set CPU time
-                    delta(n_log, i_rep) = timer%get_total_cpu_time()
+                    delta(n_log, i_rep) = timer%get_elapsed_time()
 
                 end associate
             end do
@@ -636,7 +636,7 @@ contains
                     call timer%stop()
 
                     ! Get CPU time
-                    delta(l_log, rep) = timer%get_total_cpu_time()
+                    delta(l_log, rep) = timer%get_elapsed_time()
 
                     ! Release memory
                     deallocate( a )
@@ -696,7 +696,7 @@ contains
                     call timer%stop()
 
                     ! Set CPU time
-                    delta(l_log, rep) = timer%get_total_cpu_time()
+                    delta(l_log, rep) = timer%get_elapsed_time()
 
                     ! Release memory
                     deallocate( a )
