@@ -19,9 +19,9 @@ module type_CpuTimer
     !-----------------------------------------------------------------------
     ! Dictionary: global variables confined to the module
     !-----------------------------------------------------------------------
-    integer (ip), parameter  :: REQUEST_TIME_IN_SECONDS = 0
-    integer (ip), parameter  :: REQUEST_TIME_IN_MINUTES = 1
-    integer (ip), parameter  :: REQUEST_TIME_IN_HOURS = 2
+    integer (ip), parameter  :: REQUEST_TIME_IN_SECONDS = 0_ip
+    integer (ip), parameter  :: REQUEST_TIME_IN_MINUTES = 1_ip
+    integer (ip), parameter  :: REQUEST_TIME_IN_HOURS = 2_ip
     !-----------------------------------------------------------------------
 
 
@@ -210,9 +210,7 @@ contains
             !==> If the timer was not stopped,
             !    then return the current time elapsed
             !
-            if (this%timer_stopped .eqv. .false.) then
-                call this%stop()
-            end if
+            if (this%timer_stopped .eqv. .false.) call this%stop()
 
             !
             !==> Set elapsed time in seconds
@@ -289,7 +287,7 @@ contains
         ! Dictionary: local variables
         !----------------------------------------------------------------------
         integer (ip)                  :: file_unit_op
-        integer (ip)                  :: values(8)
+        integer (long)                :: values(8)
         character (len=10)            :: time
         character (len=5)             :: zone
         character (len=8)             :: am_or_pm
@@ -428,9 +426,7 @@ contains
         !----------------------------------------------------------------------
 
         ! Check flag
-        if (this%initialized .eqv. .false.) then
-            return
-        end if
+        if (this%initialized .eqv. .false.) return
 
         ! Reset booleans
         this%initialized = .false.
@@ -442,11 +438,11 @@ contains
         this%cpu_finish_time = 0.0_wp
 
         ! Reset integers
-        this%initial_ticks = 0
-        this%final_ticks = 0
-        this%count_max = 0
-        this%count_rate = 0
-        this%num_ticks = 0
+        this%initial_ticks = 0_long
+        this%final_ticks = 0_long
+        this%count_max = 0_long
+        this%count_rate = 0_long
+        this%num_ticks = 0_long
 
     end subroutine destroy_cpu_timer
 
