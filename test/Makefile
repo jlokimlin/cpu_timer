@@ -9,6 +9,8 @@ LINKS = \
 
 EXECUTABLE = ./test.exe
 
+FC = gfortran-6 -O3 
+
 test.o: \
 test.f90
 	$(FC) $(FFLAGS) -c test.f90 $(LINKS)\

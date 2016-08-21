@@ -1,8 +1,10 @@
 program test
 
-    use, intrinsic :: iso_fortran_env, only: &
-        wp => REAL64, &
-        ip => INT32, &
+    use, intrinsic :: ISO_C_binding, only: &
+        wp => C_DOUBLE, &
+        ip => C_INT
+
+    use, intrinsic :: ISO_Fortran_env, only: &
         stdout => OUTPUT_UNIT, &
         compiler_version, &
         compiler_options
@@ -14,16 +16,12 @@ program test
     implicit none
     
     call test_all()
-
-
     
 contains
 
-
-
     subroutine test_all()
         !-----------------------------------------------------------------------
-        ! Dictionary: local variables
+        ! Local variables
         !-----------------------------------------------------------------------
         class (CpuTimer), allocatable :: timer
         !-----------------------------------------------------------------------
@@ -33,9 +31,7 @@ contains
         !
         allocate( CpuTimer :: timer )
 
-        write( stdout, '(A)' ) ''
-        write( stdout, '(A)' ) '  Demonstrate the usage of type (CpuTimer).'
-        write( stdout, '(A)' ) ''
+        write( stdout, '(/a/)' ) '  Demonstrate the usage of type (CpuTimer).'
 
         ! print time stamp
         call timer%print_time_stamp()
@@ -52,11 +48,8 @@ contains
         !
         !==> Terminate
         !
-        write( stdout, '(A)' ) ''
-        write( stdout, '(A)' ) ' type (CpuTimer) tests.'
-        write( stdout, '(A)' ) ''
-        write( stdout, '(A)' ) ' Normal end of execution.'
-        write( stdout, '(A)' ) ''
+        write( stdout, '(/a/)' ) ' type (CpuTimer) tests.'
+        write( stdout, '(a/)' ) ' Normal end of execution.'
 
         !
         !==> Print time stamp
@@ -98,7 +91,7 @@ contains
         !   12/20/15       Jon Lo Kim Lin         Object-oriented implementation
         !
         !-----------------------------------------------------------------------
-        ! Dictionary: local variables
+        ! Local variables
         !-----------------------------------------------------------------------
         type (CpuTimer)        :: timer
         integer(ip)            :: n_log, rep   !! Counters
@@ -202,7 +195,7 @@ contains
         !   12/20/15       Jon Lo Kim Lin         Object-oriented implementation
         !
         !----------------------------------------------------------------------
-        ! Dictionary: local variables
+        ! Local variables
         !----------------------------------------------------------------------
         type (CpuTimer)         :: timer
         integer(ip)             :: func, i_rep, n_log !! Counters
@@ -316,7 +309,7 @@ contains
         !   12/20/15       Jon Lo Kim Lin         Object-oriented implementation
         !
         !----------------------------------------------------------------------
-        ! Dictionary: local variables
+        ! Local variables
         !----------------------------------------------------------------------
         type (CpuTimer)         :: timer
         integer(ip)             :: func, i, i_rep, n_log !! Counters
@@ -449,7 +442,7 @@ contains
         !   12/20/15       Jon Lo Kim Lin         Object-oriented implementation
         !
         !----------------------------------------------------------------------
-        ! Dictionary: local variables
+        ! Local variables
         !----------------------------------------------------------------------
         type (CpuTimer)        :: timer
         integer(ip)            :: i, i_rep, n_log !! Counters
@@ -566,7 +559,7 @@ contains
         !   12/20/15       Jon Lo Kim Lin         Object-oriented implementation
         !
         !----------------------------------------------------------------------
-        ! Dictionary: local variables
+        ! Local variables
         !----------------------------------------------------------------------
         type (CpuTimer)           :: timer
         integer(ip)               :: i, j, k !! Counters
@@ -664,15 +657,14 @@ contains
 
         do l_log = L_LOG_MIN, L_LOG_MAX
             associate( l => 4**( l_log ) )
-                write( stdout, '(I11,5(1PE15.5))' ) l, delta(l_log,:)
+                write( stdout, '(i11,5(1pe15.5))' ) l, delta(l_log,:)
             end associate
         end do
 
         !
         !==> Perform optimized calculation
         !
-        write( stdout, '(A)' ) ''
-        write( stdout, '(A)' ) '  Use the matmul routine for matrix multiplication.'
+        write( stdout, '(/a)' ) '  Use the matmul routine for matrix multiplication.'
 
         do rep = 1, REP_NUM
             do l_log = L_LOG_MIN, L_LOG_MAX
@@ -710,26 +702,22 @@ contains
         !
         !==> Print optimized results
         !
-        write( stdout, '(A)' ) ''
-        write( stdout, '(A)' ) '  Timing results using matmul:'
-        write( stdout, '(A)' ) ''
-        write( stdout, '(6A)' ) &
+        write( stdout, '(/a/)' ) '  Timing results using matmul:'
+        write( stdout, '(6a/)' ) &
             '       Size    ',&
             'Rep #1         ', &
             'Rep #2         ',&
             'Rep #3         ',&
             'Rep #4         ',&
             'Rep #5         '
-        write( stdout, '(A)' ) ''
 
         do l_log = L_LOG_MIN, L_LOG_MAX
             associate( l => 4**( l_log ))
-                write( stdout, '(I11,5(1PE15.5))' ) l, delta(l_log,:)
+                write( stdout, '(i11,5(1pe15.5))' ) l, delta(l_log,:)
             end associate
         end do
 
     end subroutine time_matrix_multiplication_problem
-
 
 
 end program test

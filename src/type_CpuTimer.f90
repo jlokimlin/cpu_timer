@@ -1,9 +1,11 @@
 module type_CpuTimer
 
-    use, intrinsic :: iso_fortran_env, only: &
-        wp => REAL64, &
-        ip => INT32, &
-        long => INT64, &
+    use, intrinsic :: ISO_C_binding, only: &
+        wp => C_DOUBLE, &
+        ip => C_INT, &
+        long => C_LONG_LONG
+
+    use, intrinsic :: ISO_Fortran_env, only: &
         stdout => OUTPUT_UNIT, &
         compiler_version, &
         compiler_options
@@ -15,23 +17,21 @@ module type_CpuTimer
     private
     public :: CpuTimer
 
-
     !-----------------------------------------------------------------------
-    ! Dictionary: global variables confined to the module
+    ! Variables confined to the module
     !-----------------------------------------------------------------------
-    integer (ip), parameter  :: REQUEST_TIME_IN_SECONDS = 0_ip
-    integer (ip), parameter  :: REQUEST_TIME_IN_MINUTES = 1_ip
-    integer (ip), parameter  :: REQUEST_TIME_IN_HOURS = 2_ip
+    integer (ip), parameter :: REQUEST_TIME_IN_SECONDS = 0_ip
+    integer (ip), parameter :: REQUEST_TIME_IN_MINUTES = 1_ip
+    integer (ip), parameter :: REQUEST_TIME_IN_HOURS = 2_ip
     !-----------------------------------------------------------------------
-
 
     ! Declare derived data type
     type, public :: CpuTimer
         !-----------------------------------------------------------------------
-        ! Class variables
+        ! Type-components
         !-----------------------------------------------------------------------
         logical,        private :: initialized = .false.
-        logical,        private :: timer_started  = .false.
+        logical,        private :: timer_started = .false.
         logical,        private :: timer_stopped = .false.
         real (wp),      private :: cpu_start_time = 0.0_wp
         real (wp),      private :: cpu_finish_time = 0.0_wp
@@ -43,7 +43,7 @@ module type_CpuTimer
         !-----------------------------------------------------------------------
     contains
         !-----------------------------------------------------------------------
-        ! Class methods
+        ! Type-bound procedures
         !-----------------------------------------------------------------------
         procedure, public         :: start => start_cpu_timer
         procedure, public         :: stop => stop_cpu_timer
@@ -57,13 +57,11 @@ module type_CpuTimer
         !----------------------------------------------------------------------
     end type CpuTimer
 
-
 contains
-
 
     subroutine start_cpu_timer(this)
         !----------------------------------------------------------------------
-        ! Dictionary: calling arguments
+        ! Dummy arguments
         !----------------------------------------------------------------------
         class (CpuTimer), intent (in out) :: this
         !----------------------------------------------------------------------
@@ -98,7 +96,7 @@ contains
 
     subroutine stop_cpu_timer(this)
         !----------------------------------------------------------------------
-        ! Dictionary: calling arguments
+        ! Dummy arguments
         !----------------------------------------------------------------------
         class (CpuTimer), intent (in out) :: this
         !----------------------------------------------------------------------
@@ -132,10 +130,9 @@ contains
     end subroutine stop_cpu_timer
 
 
-
     function get_total_cpu_time(this, units) result (return_value)
         !----------------------------------------------------------------------
-        ! Dictionary: calling arguments
+        ! Dummy arguments
         !----------------------------------------------------------------------
         class (CpuTimer),       intent (in out) :: this
         integer (ip), optional, intent (in)     :: units
@@ -187,11 +184,9 @@ contains
     end function get_total_cpu_time
 
 
-
-
     function get_elapsed_time(this, units) result (return_value)
         !----------------------------------------------------------------------
-        ! Dictionary: calling arguments
+        ! Dummy arguments
         !----------------------------------------------------------------------
         class (CpuTimer),       intent (in out) :: this
         integer (ip), optional, intent (in)     :: units
@@ -255,7 +250,6 @@ contains
     end function get_elapsed_time
 
 
-
     subroutine print_time_stamp(file_unit)
         !
         ! Purpose:
@@ -280,11 +274,11 @@ contains
         !   12/20/15       Jon Lo Kim Lin         Object-oriented implementation
         !
         !----------------------------------------------------------------------
-        ! Dictionary: calling arguments
+        ! Dummy arguments
         !----------------------------------------------------------------------
         integer (ip), intent (in), optional :: file_unit
         !----------------------------------------------------------------------
-        ! Dictionary: local variables
+        ! Local variables
         !----------------------------------------------------------------------
         integer (ip)                  :: file_unit_op
         integer (long)                :: values(8)
@@ -297,7 +291,7 @@ contains
             'May      ', 'June     ', 'July     ', 'August   ', &
             'September', 'October  ', 'November ', 'December ' ]
         character (len=*), parameter  :: time_format = &
-            '( A, 1X, I2, 1X, I4, 2X, I2, A1, I2.2, A1, I2.2, A1, I3.3, 1X, A)'
+            '( a, 1x, i2, 1x, i4, 2x, i2, a1, i2.2, a1, i2.2, a1, i3.3, 1x, a)'
         !----------------------------------------------------------------------
 
         !
@@ -328,20 +322,20 @@ contains
             millisecond => values(8) &
             )
 
-            if ( hour < 12 ) then
+            if (hour < 12) then
                 am_or_pm = 'AM'
-            else if ( hour == 12 ) then
-                if ( minute == 0 .and. second == 0 ) then
+            else if (hour == 12) then
+                if (minute == 0 .and. second == 0) then
                     am_or_pm = 'Noon'
                 else
                     am_or_pm = 'PM'
                 end if
             else
                 hour = hour - 12
-                if ( hour < 12 ) then
+                if (hour < 12) then
                     am_or_pm = 'PM'
-                else if ( hour == 12 ) then
-                    if ( minute == 0 .and. second == 0 ) then
+                else if (hour == 12) then
+                    if (minute == 0 .and. second == 0) then
                         am_or_pm = 'Midnight'
                     else
                         am_or_pm = 'AM'
@@ -353,10 +347,10 @@ contains
             !==> Print time stamp
             !
             write( file_unit_op, fmt=time_format ) &
-                trim( LIST_OF_MONTHS( month ) ), &
+                trim(LIST_OF_MONTHS(month)), &
                 day, year, hour, ':', &
                 minute, ':', second, '.', &
-                millisecond, trim( am_or_pm )
+                millisecond, trim(am_or_pm)
         end associate
 
     end subroutine print_time_stamp
@@ -364,11 +358,11 @@ contains
 
     subroutine print_compiler_info(file_unit)
         !----------------------------------------------------------------------
-        ! Dictionary: calling arguments
+        ! Dummy arguments
         !----------------------------------------------------------------------
         integer (ip), intent (in), optional :: file_unit
         !----------------------------------------------------------------------
-        ! Dictionary: calling arguments
+        ! Local variables
         !----------------------------------------------------------------------
         integer (ip) :: file_unit_op
         !----------------------------------------------------------------------
@@ -385,18 +379,16 @@ contains
         !
         !==> Print compiler info
         !
-        write( file_unit_op, '(A)' ) ''
-        write( file_unit_op, '(4A)' ) 'This file was compiled by ', &
-            compiler_version(), ' using the options ', &
-            compiler_options()
-        write( file_unit_op, '(A)' ) ''
+        write( file_unit_op, '(/4a/)' ) &
+            ' This file was compiled by ', compiler_version(), &
+            ' using the options ', compiler_options()
 
     end subroutine print_compiler_info
 
 
     subroutine create_cpu_timer(this)
         !----------------------------------------------------------------------
-        ! Dictionary: calling arguments
+        ! Dummy arguments
         !----------------------------------------------------------------------
         class (CpuTimer), intent (in out) :: this
         !----------------------------------------------------------------------
@@ -417,10 +409,9 @@ contains
     end subroutine create_cpu_timer
 
 
-
     subroutine destroy_cpu_timer(this)
         !----------------------------------------------------------------------
-        ! Dictionary: calling arguments
+        ! Dummy arguments
         !----------------------------------------------------------------------
         class (CpuTimer), intent (in out) :: this
         !----------------------------------------------------------------------
@@ -447,11 +438,10 @@ contains
     end subroutine destroy_cpu_timer
 
 
-
     subroutine finalize_cpu_timer(this)
         !
         !----------------------------------------------------------------------
-        ! Dictionary: calling arguments
+        ! Dummy arguments
         !----------------------------------------------------------------------
         type (CpuTimer), intent (in out) :: this
         !----------------------------------------------------------------------
@@ -459,7 +449,6 @@ contains
         call this%destroy_cpu_timer()
 
     end subroutine finalize_cpu_timer
-
 
 
 end module type_CpuTimer
