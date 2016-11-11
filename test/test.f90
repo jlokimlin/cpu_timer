@@ -1,16 +1,14 @@
 program test
 
-    use, intrinsic :: ISO_C_binding, only: &
-        wp => C_DOUBLE, &
-        ip => C_INT
-
     use, intrinsic :: ISO_Fortran_env, only: &
         stdout => OUTPUT_UNIT, &
         compiler_version, &
         compiler_options
 
     use cpu_timer_library, only: &
-        CpuTimer
+        CpuTimer, &
+        wp, & ! working precision
+        ip ! integer precision
 
     ! Explicit typing only
     implicit none
@@ -68,8 +66,6 @@ contains
 
     end subroutine test_all
 
-
-
     subroutine time_random_number_routine()
         !
         !  Purpose:
@@ -107,18 +103,13 @@ contains
         !
         !==> Print program description
         !
-        write( stdout, '(A)' )     ''
-        write( stdout, '(A)' )     '*********************************************'
-        write( stdout, '(A)' )     ''
-        write( stdout, '(A)' )     ' time_random_number_routine'
-        write( stdout, '(A)' )     ''
-        write( stdout, '(A)' )     ' times the intrinsic random_number routine:'
-        write( stdout, '(A)' )     ''
-        write( stdout, '(A)' )     '    call random_number( x(1:n) )'
-        write( stdout, '(A)' )     ''
-        write( stdout, '(A, I11)' ) '  Data vectors will be of minimum size    ', N_MIN
-        write( stdout, '(A, I11)' ) '  Data vectors will be of maximum size    ', N_MAX
-        write( stdout, '(A, I11)' ) '  Number of repetitions of the operation: ', REP_NUM
+        write( stdout, '(/a/)' )     '*********************************************'
+        write( stdout, '(a/)' )     ' time_random_number_routine'
+        write( stdout, '(a/)' )     ' times the intrinsic random_number routine:'
+        write( stdout, '(a/)' )     '    call random_number( x(1:n) )'
+        write( stdout, '(a, i11)' ) '  Data vectors will be of minimum size    ', N_MIN
+        write( stdout, '(a, i11)' ) '  Data vectors will be of maximum size    ', N_MAX
+        write( stdout, '(a, i11)' ) '  Number of repetitions of the operation: ', REP_NUM
 
         !
         !==> Perform calculation
@@ -149,9 +140,9 @@ contains
         !
         !==> Print results
         !
-        write( stdout, '(A)' ) ''
-        write( stdout, '(A)' ) '  Timing results:'
-        write( stdout, '(A)' ) ''
+        write( stdout, '(a)' ) ''
+        write( stdout, '(a)' ) '  Timing results:'
+        write( stdout, '(a)' ) ''
         write( stdout, '(9A)' ) &
             '       Size    ',&
             'Rep #1         ', &
@@ -162,7 +153,7 @@ contains
             'MINVAL         ',&
             'SUM            ',&
             'MAXVAL         '
-        write( stdout, '(A)' ) ''
+        write( stdout, '(a)' ) ''
 
         do n_log = N_LOG_MIN, N_LOG_MAX
             associate( n => 2**(n_log) )
@@ -172,7 +163,6 @@ contains
         end do
 
     end subroutine time_random_number_routine
-
 
     subroutine time_vectorized_exp_routine()
         !
@@ -213,19 +203,19 @@ contains
         !
         !==> Print program description
         !
-        write( stdout, '(A)' ) ''
-        write( stdout, '(A)' ) '*********************************************'
-        write( stdout, '(A)' ) ''
-        write( stdout, '(A)' ) '  time_vectorized_exp_routine:'
-        write( stdout, '(A)' ) ''
-        write( stdout, '(A)' ) '    y(1:n) = x(1:n)  '
-        write( stdout, '(A)' ) '    y(1:n) = PI * x(1:n)  '
-        write( stdout, '(A)' ) '    y(1:n) = sqrt( x(1:n) )'
-        write( stdout, '(A)' ) '    y(1:n) = exp( x(1:n) )'
-        write( stdout, '(A)' ) ''
-        write( stdout, '(A, I11)' ) '  Data vectors will be of minimum size    ', N_MIN
-        write( stdout, '(A, I11)' ) '  Data vectors will be of maximum size    ', N_MAX
-        write( stdout, '(A, I11)' ) '  Number of repetitions of the operation: ', N_REP
+        write( stdout, '(a)' ) ''
+        write( stdout, '(a)' ) '*********************************************'
+        write( stdout, '(a)' ) ''
+        write( stdout, '(a)' ) '  time_vectorized_exp_routine:'
+        write( stdout, '(a)' ) ''
+        write( stdout, '(a)' ) '    y(1:n) = x(1:n)  '
+        write( stdout, '(a)' ) '    y(1:n) = PI * x(1:n)  '
+        write( stdout, '(a)' ) '    y(1:n) = sqrt( x(1:n) )'
+        write( stdout, '(a)' ) '    y(1:n) = exp( x(1:n) )'
+        write( stdout, '(a)' ) ''
+        write( stdout, '(a, i11)' ) '  Data vectors will be of minimum size    ', N_MIN
+        write( stdout, '(a, i11)' ) '  Data vectors will be of maximum size    ', N_MAX
+        write( stdout, '(a, i11)' ) '  Number of repetitions of the operation: ', N_REP
 
         !
         !==> Perform optimized calculation
@@ -266,9 +256,9 @@ contains
             !
             !==> Print optimized results
             !
-            write( stdout, '(A)' ) ''
-            write( stdout, '(A)' ) '  Timing results:'
-            write( stdout, '(A)' ) ''
+            write( stdout, '(a)' ) ''
+            write( stdout, '(a)' ) '  Timing results:'
+            write( stdout, '(a)' ) ''
             write( stdout, '(6A)' ) &
                 '       Size    ',&
                 'Rep #1         ', &
@@ -276,7 +266,7 @@ contains
                 'Rep #3         ',&
                 'Rep #4         ',&
                 'Rep #5         '
-            write( stdout, '(A)' ) ''
+            write( stdout, '(a)' ) ''
 
             do n_log = N_LOG_MIN, N_LOG_MAX
                 associate( n => 2**(n_log) )
@@ -286,7 +276,6 @@ contains
         end do
 
     end subroutine time_vectorized_exp_routine
-
 
     subroutine time_unvectorized_exp_routine()
         !
@@ -327,21 +316,21 @@ contains
         !
         !==> Print program description
         !
-        write( stdout, '(A)' ) ''
-        write( stdout, '(A)' ) '*********************************************'
-        write( stdout, '(A)' ) ''
-        write( stdout, '(A)' ) ' time_unvectorized_exp_routine'
-        write( stdout, '(A)' ) ''
-        write( stdout, '(A)' ) '    do i = 1, n'
-        write( stdout, '(A)' ) '      y(i) = x(i)  '
-        write( stdout, '(A)' ) '      y(i) = PI * x(i)  '
-        write( stdout, '(A)' ) '      y(i) = sqrt(x(i))'
-        write( stdout, '(A)' ) '      y(i) = exp(x(i))'
-        write( stdout, '(A)' ) '    end do'
-        write( stdout, '(A)' ) ''
-        write( stdout, '(A, I11)' ) '  Data vectors will be of minimum size    ',    N_MIN
-        write( stdout, '(A, I11)' ) '  Data vectors will be of maximum size    ',    N_MAX
-        write( stdout, '(A, I11)' ) '  Number of repetitions of the operation: ', N_REP
+        write( stdout, '(a)' ) ''
+        write( stdout, '(a)' ) '*********************************************'
+        write( stdout, '(a)' ) ''
+        write( stdout, '(a)' ) ' time_unvectorized_exp_routine'
+        write( stdout, '(a)' ) ''
+        write( stdout, '(a)' ) '    do i = 1, n'
+        write( stdout, '(a)' ) '      y(i) = x(i)  '
+        write( stdout, '(a)' ) '      y(i) = PI * x(i)  '
+        write( stdout, '(a)' ) '      y(i) = sqrt(x(i))'
+        write( stdout, '(a)' ) '      y(i) = exp(x(i))'
+        write( stdout, '(a)' ) '    end do'
+        write( stdout, '(a)' ) ''
+        write( stdout, '(a, i11)' ) '  Data vectors will be of minimum size    ',    N_MIN
+        write( stdout, '(a, i11)' ) '  Data vectors will be of maximum size    ',    N_MAX
+        write( stdout, '(a, i11)' ) '  Number of repetitions of the operation: ', N_REP
 
         !
         !==> Perform naive calculation
@@ -396,11 +385,11 @@ contains
             !
             !==> Print naive results
             !
-            write( stdout, '(A)' ) ''
-            write( stdout, '(A)' ) '*********************************************'
-            write( stdout, '(A)' ) ''
-            write( stdout, '(A)' ) '  Timing results:'
-            write( stdout, '(A)' ) ''
+            write( stdout, '(a)' ) ''
+            write( stdout, '(a)' ) '*********************************************'
+            write( stdout, '(a)' ) ''
+            write( stdout, '(a)' ) '  Timing results:'
+            write( stdout, '(a)' ) ''
             write( stdout, '(6A)' ) &
                 '       Size    ',&
                 'Rep #1         ', &
@@ -408,7 +397,7 @@ contains
                 'Rep #3         ',&
                 'Rep #4         ',&
                 'Rep #5         '
-            write( stdout, '(A)' ) ''
+            write( stdout, '(a)' ) ''
 
             do n_log = N_LOG_MIN, N_LOG_MAX
                 associate( n => 2**(n_log) )
@@ -418,8 +407,6 @@ contains
         end do loop_over_functions
 
     end subroutine time_unvectorized_exp_routine
-
-
 
     subroutine time_2d_nearest_neighbor_problem()
         !
@@ -461,23 +448,23 @@ contains
         !
         !==> Print program description
         !
-        write( stdout, '(A)' ) ''
-        write( stdout, '(A)' ) '*********************************************'
-        write( stdout, '(A)' ) ''
-        write( stdout, '(A)' ) '  time_2d_nearest_neighbor_problem'
-        write( stdout, '(A)' ) ''
-        write( stdout, '(A)' ) '  Given x(2,n) and y(2),'
-        write( stdout, '(A)' ) ''
-        write( stdout, '(A)' ) '    find x(2,*) closest to y(2).'
-        write( stdout, '(A)' ) ''
-        write( stdout, '(A)' ) '    do i = 1, n'
-        write( stdout, '(A)' ) '      if distance( x(2,i), y ) < minimum so far'
-        write( stdout, '(A)' ) '        x_min = x(2,i)'
-        write( stdout, '(A)' ) '    end do'
-        write( stdout, '(A)' ) ''
-        write( stdout, '(A, I11)' ) '  Data vectors will be of minimum size    ', N_MIN
-        write( stdout, '(A, I11)' ) '  Data vectors will be of maximum size    ', N_MAX
-        write( stdout, '(A, I11)' ) '  Number of repetitions of the operation: ', N_REP
+        write( stdout, '(a)' ) ''
+        write( stdout, '(a)' ) '*********************************************'
+        write( stdout, '(a)' ) ''
+        write( stdout, '(a)' ) '  time_2d_nearest_neighbor_problem'
+        write( stdout, '(a)' ) ''
+        write( stdout, '(a)' ) '  Given x(2,n) and y(2),'
+        write( stdout, '(a)' ) ''
+        write( stdout, '(a)' ) '    find x(2,*) closest to y(2).'
+        write( stdout, '(a)' ) ''
+        write( stdout, '(a)' ) '    do i = 1, n'
+        write( stdout, '(a)' ) '      if distance( x(2,i), y ) < minimum so far'
+        write( stdout, '(a)' ) '        x_min = x(2,i)'
+        write( stdout, '(a)' ) '    end do'
+        write( stdout, '(a)' ) ''
+        write( stdout, '(a, i11)' ) '  Data vectors will be of minimum size    ', N_MIN
+        write( stdout, '(a, i11)' ) '  Data vectors will be of maximum size    ', N_MAX
+        write( stdout, '(a, i11)' ) '  Number of repetitions of the operation: ', N_REP
 
         !
         !==> Perform calculation
@@ -516,9 +503,9 @@ contains
             end do
         end do
 
-        write( stdout, '(A)' ) ''
-        write( stdout, '(A)' ) '  Timing results:'
-        write( stdout, '(A)' ) ''
+        write( stdout, '(a)' ) ''
+        write( stdout, '(a)' ) '  Timing results:'
+        write( stdout, '(a)' ) ''
         write( stdout, '(6A)' ) &
             '       Size    ',&
             'Rep #1         ', &
@@ -526,7 +513,7 @@ contains
             'Rep #3         ',&
             'Rep #4         ',&
             'Rep #5         '
-        write( stdout, '(A)' ) ''
+        write( stdout, '(a)' ) ''
 
         do n_log = N_LOG_MIN, N_LOG_MAX
             associate( n => 2**(n_log) )
@@ -535,8 +522,6 @@ contains
         end do
 
     end subroutine time_2d_nearest_neighbor_problem
-
-
 
     subroutine time_matrix_multiplication_problem()
         !
@@ -578,25 +563,25 @@ contains
         !
         !==> Print program description
         !
-        write( stdout, '(A)' ) ''
-        write( stdout, '(A)' ) '*********************************************'
-        write( stdout, '(A)' ) ''
-        write( stdout, '(A)' ) '  time_matrix_multiplication_problem'
-        write( stdout, '(A)' ) ''
-        write( stdout, '(A)' ) '  Compute C = A * B'
-        write( stdout, '(A)' ) ''
-        write( stdout, '(A)' ) '  where'
-        write( stdout, '(A)' ) '    A is an L by M matrix,'
-        write( stdout, '(A)' ) '    B is an M by N matrix,'
-        write( stdout, '(A)' ) '  and so'
-        write( stdout, '(A)' ) '    C is an L by N matrix.'
-        write( stdout, '(A)' ) ''
-        write( stdout, '(A, I11)' ) '  Minimum value of L = M = N =            ', L_MIN
-        write( stdout, '(A, I11)' ) '  Maximum value of L = M = N =            ', L_MAX
-        write( stdout, '(A, I11)' ) '  Number of repetitions of the operation: ', REP_NUM
+        write( stdout, '(a)' ) ''
+        write( stdout, '(a)' ) '*********************************************'
+        write( stdout, '(a)' ) ''
+        write( stdout, '(a)' ) '  time_matrix_multiplication_problem'
+        write( stdout, '(a)' ) ''
+        write( stdout, '(a)' ) '  Compute C = A * B'
+        write( stdout, '(a)' ) ''
+        write( stdout, '(a)' ) '  where'
+        write( stdout, '(a)' ) '    A is an L by M matrix,'
+        write( stdout, '(a)' ) '    B is an M by N matrix,'
+        write( stdout, '(a)' ) '  and so'
+        write( stdout, '(a)' ) '    C is an L by N matrix.'
+        write( stdout, '(a)' ) ''
+        write( stdout, '(a, i11)' ) '  Minimum value of L = M = N =            ', L_MIN
+        write( stdout, '(a, i11)' ) '  Maximum value of L = M = N =            ', L_MAX
+        write( stdout, '(a, i11)' ) '  Number of repetitions of the operation: ', REP_NUM
 
-        write( stdout, '(A)' ) ''
-        write( stdout, '(A)' ) '  Use nested do loops for matrix multiplication.'
+        write( stdout, '(a)' ) ''
+        write( stdout, '(a)' ) '  Use nested do loops for matrix multiplication.'
 
         !
         !==> Perform naive calculation
@@ -643,9 +628,9 @@ contains
         !
         !==> Print naive results
         !
-        write( stdout, '(A)' ) ''
-        write( stdout, '(A)' ) '  Timing results using nested do loops:'
-        write( stdout, '(A)' ) ''
+        write( stdout, '(a)' ) ''
+        write( stdout, '(a)' ) '  Timing results using nested do loops:'
+        write( stdout, '(a)' ) ''
         write( stdout, '(6A)' ) &
             '       Size    ',&
             'Rep #1         ', &
@@ -653,7 +638,7 @@ contains
             'Rep #3         ',&
             'Rep #4         ',&
             'Rep #5         '
-        write( stdout, '(A)' ) ''
+        write( stdout, '(a)' ) ''
 
         do l_log = L_LOG_MIN, L_LOG_MAX
             associate( l => 4**( l_log ) )
@@ -718,6 +703,5 @@ contains
         end do
 
     end subroutine time_matrix_multiplication_problem
-
 
 end program test

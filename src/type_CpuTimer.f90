@@ -15,7 +15,7 @@ module type_CpuTimer
 
     ! Everything is private unless stated otherwise
     private
-    public :: CpuTimer
+    public :: CpuTimer, wp, ip
 
     !-----------------------------------------------------------------------
     ! Variables confined to the module
