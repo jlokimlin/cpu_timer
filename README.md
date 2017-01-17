@@ -4,8 +4,7 @@ An object-oriented library for computing elapsed CPU time. More specifically, yo
 
 ```fortran
 
-	!... start timer
-	
+	!... start timer	
 	do i = 1, n
 		
 		!...some big calculation...
@@ -13,7 +12,6 @@ An object-oriented library for computing elapsed CPU time. More specifically, yo
 	end do
 	
 	!...stop timer
-	
 	print *, 'Elapsed CPU time = ', blah
 ```
 
